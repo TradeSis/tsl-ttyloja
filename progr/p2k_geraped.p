@@ -410,7 +410,7 @@ for each movim where movim.etbcod = plani.etbcod
         Plani.notass    format "9999999999" /* Numero_Pedido */
         Movim.movseq    format "999999"     /* Seq_Item_Pedido */
         0               format "99999"      /* Num_Componente  */
-        wf-movim.vencod    format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
+        wf-movim.vencod    format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */        
         string(Movim.procod,"99999999999999999999")
                         format "x(20)"      /* Codigo_Produto */
         0 /**Movim.procod**/    format "99999999999999" /* Cod_Autom_Prod */
@@ -476,14 +476,21 @@ then put unformatted
 else
 if pmoeda <> ""
 then do:
+    
+    vplano = 0.
     if pmoeda = "DINHEIRO"  then vforma = 1.
     if pmoeda = "TEFDEBITO" then vforma = 9.
+    if pmoeda = "PIX"       
+    then do:
+        vforma = 20. /* Helio 04032024 */
+        vplano = 2.
+    end.    
     
-     put unformatted
+    put unformatted
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        0 /* forca plano 0*/ /*plani.pedcod */   format "99999" /* plani */
+        vplano format "99999" /* plano */
         vprotot * 100   format "9999999999999"
         skip.
 
@@ -516,7 +523,7 @@ for each tt-seg-movim no-lock.
         Plani.etbcod        format "99999"      /* Codigo_Loja */
         Plani.notass        format "9999999999" /* Numero_Pedido */
         0                   format "99999"      /* Num_Componente */
-        wf-movim.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
+        wf-movim.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */        
         string(tt-seg-movim.procod,"99999999999999999999")
                             format "x(20)"      /* Codigo_Produto */
         0                   format "99999999999999" /* Cod_Autom_Prod */
