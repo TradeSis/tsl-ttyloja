@@ -597,20 +597,7 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                             with frame f-condi.
                     pause 0.         
 
-                hide message no-pause .
-                bell.
-                message "Selecione uma moeda de pagamento, pois a venda eh com produto em promoção". 
-                def var cmoedas as char format "x(36)" extent 2 init ["     [Pagamento em Dinheiro]",
-                                                                      "[Pagamento em Cartao de Debito]"].
-                        disp cmoedas with frame fcmoedas row 10 centered 
-                    overlay no-labels
-                    title " PAGAMENTO A VISTA COM PROMOCAO " + string(vpromocoes) + " - SELECIONE MOEDAS ".
-                choose field cmoedas with frame fcmoedas.
-                pmoeda = if frame-index = 1 then "DINHEIRO" else "TEFDEBITO".
-                disp 
-                     finan.finnom + " [" + pmoeda + "]" @ finan.finnom with frame f-desti.
-                hide message no-pause.
-                hide frame fcmoedas no-pause.                
+                {pdvselmoeda.i}                
             end.
         end.
 
@@ -882,23 +869,19 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
         if identificador <> "" 
         then display identificador with frame f-desti.                
     end.
-    /* helio 07062024 - comissao crediarista 
-     *   find first wf-movim no-lock no-error.
-     *   if avail wf-movim
-     *   then v-vendedor = wf-movim.vencod.
-     *   else 
-    */          v-vendedor = 0.
+    find first wf-movim no-lock no-error.
+    if avail wf-movim
+    then v-vendedor = wf-movim.vencod.
+    else v-vendedor = 0.
     do on error undo: 
         v-vencod = v-vendedor.
         update v-vendedor with  frame f-desti. 
-        /* helio 07062024 - comissao crediarista
-        *if v-vencod > 0 and v-vendedor <> v-vencod
-        *then do:
-        *    message " Vendedor nao pode ser alterado.".
-        *    v-vendedor = v-vencod.
-        *    undo.
-        *end.
-        */
+        if v-vencod > 0 and v-vendedor <> v-vencod
+        then do:
+            message " Vendedor nao pode ser alterado.".
+            v-vendedor = v-vencod.
+            undo.
+        end.
         find func where func.funcod = v-vendedor and 
                         func.etbcod = setbcod no-lock no-error.
         if not avail func 
@@ -911,8 +894,8 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
              func.funnom with frame f-desti. 
     
         v-vencod = v-vendedor. 
-        /* helio 07062024 - comissao crediarista - so os zerados */    
-        for each wf-movim where wf-movim.vencod = 0. 
+    
+        for each wf-movim. 
             wf-movim.vencod = func.funcod. 
         end.
     end. 
