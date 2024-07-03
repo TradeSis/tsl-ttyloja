@@ -51,6 +51,7 @@ procedure vende-segprod.
     /*
         1. Verificar se tem seguro
     */
+    message par-procod par-precoori par-movpc.
     
     def var vtempogar as int.
     find first produaux where produaux.procod     = par-procod
@@ -58,6 +59,7 @@ procedure vende-segprod.
                         NO-LOCK no-error.
     if avail produaux
     then vtempogar = int(produaux.valor_campo).
+    message vtempogar.
     
     if vtempogar > 0
     then do.
@@ -91,7 +93,6 @@ procedure inclusao-segprod.
                        where tt-seg-movim.seg-procod = btt-segprodu.seg-procod
                          and tt-seg-movim.procod     = par-procod
                        no-error.
-    
     if not avail tt-seg-movim
     then do.
         create tt-seg-movim.

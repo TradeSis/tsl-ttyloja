@@ -18,11 +18,6 @@ repeat.
         ttp2k_pedido01.codigo_loja    = int(substring(vlinha,3,5)).
         ttp2k_pedido01.Codigo_Cliente = int(substring(vlinha,38,20)).
         ttp2k_pedido01.nome_cliente   = substring(vlinha,78,40).
-
-        ttp2k_pedido01.dataPedido     = date(int(substring(vlinha,28,2)),
-                                             int(substring(vlinha,30,2)), 
-                                             int(substring(vlinha,24,4))  ).
-        
         if ttp2k_pedido01.Codigo_Cliente <> 0 and ttp2k_pedido01.Codigo_Cliente <> 1
         then do:
             find clien where clien.clicod = ttp2k_pedido01.Codigo_Cliente no-lock no-error.

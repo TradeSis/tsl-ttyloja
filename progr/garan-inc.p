@@ -47,7 +47,6 @@ def var vqtd as int.
         end.
                                 
         run garan-ws.p (vprocod, vprecoori, vmovpc).
-        
         find first tt-segprodu no-lock no-error.
         if not avail tt-segprodu
         then return.
@@ -164,6 +163,7 @@ def var vqtd as int.
             return.
         end.
         /* */
+        
         run inclusao-segprod (recid(tt-segprodu), vprocod, vmovpc).
 
 

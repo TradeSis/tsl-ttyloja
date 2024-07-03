@@ -6,14 +6,13 @@ def var par-dir as char.
 par-dir = "/usr/p2ksp/pedidos/ped_download/" + string(petbcod,"9999") + "/".
 
 def temp-table tt-arqs no-undo
-    field arquivos as char format "x(20)" label "Arquivo"
+    field arquivos as char format "x(25)" label "Arquivo"
     field full-pathname as char
-     field Numero_Pedido  as int format ">>>>>>>>>>9" column-label "Pedido"
+     field Numero_Pedido  as int format ">>>>>>>>>>9"
     field codigo_loja    as int format ">>9" label "Fil"
     field Codigo_Cliente as int format ">>>>>>>>>9" label "Cliente"
-    field nome_cliente   as char format "x(15)" label "Nome"
-    field dataPedido     as date format "99/99/9999"
-    index arquivo is unique primary Numero_Pedido desc arquivos asc.
+    field nome_cliente   as char format "x(20)" label "Nome"
+    index arquivo is unique primary arquivos asc.
 
 {pedidos_p2k.i}
 
@@ -55,21 +54,13 @@ end.
         run importa_file_p2k.p (input tt-arqs.FULL-PATHNAME,1).
  
 
-        find first ttp2k_pedido01 no-error.
-        if avail ttp2k_pedido01
-        then do:
+        find first ttp2k_pedido01.
         tt-arqs.numero_pedido   = ttp2k_pedido01.numero_pedido.
         tt-arqs.codigo_loja     = ttp2k_pedido01.codigo_loja.
         tt-arqs.Codigo_Cliente  = ttp2k_pedido01.Codigo_Cliente.
         tt-arqs.nome_cliente    = ttp2k_pedido01.nome_cliente.
-        tt-arqs.dataPedido      = ttp2k_pedido01.dataPedido.
         delete ttp2k_pedido01.    
-        end.    
-
-        if tt-arqs.datapedido < today - 2 then do:
-            delete tt-arqs.
-        end.    
-
+    
     END.
     input close.
  
@@ -232,7 +223,6 @@ procedure frame-a.
 
     display
         tt-arqs.arquivos
-        tt-arqs.dataPedido
         tt-arqs.numero_pedido
         tt-arqs.codigo_loja
         tt-arqs.Codigo_Cliente
