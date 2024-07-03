@@ -95,13 +95,13 @@ form vmens no-label
       with frame f-mensagem color message row screen-lines
              overlay centered no-box.
 form
-    vcupomb2b           colon 15 label "Cupom"   /* 23012023 helio - projeto cupom desconto b2b */
+        /*vcupomb2b           colon 15 label "Cupom"   */
      vfincod              colon 15 label "Plano"
      finan.finnom        no-label  
           identificador   label "Identificador" colon 15
      v-vendedor label "Vendedor" colon 15
      func.funnom no-label format "x(25)"
-     with frame f-desti row 12 side-label overlay column 23 color white/cyan
+     with frame f-desti row 13 side-label overlay column 23 color white/cyan
             width 58.
 form vprocod       label "Produto"
      produ.pronom  no-label format "x(25)"
