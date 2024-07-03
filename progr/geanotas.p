@@ -1,6 +1,7 @@
 {admcab.i}
 {apibusca-garantia.i}
 def input param pcpf as dec.
+def input param pclicod as int.
 def output param precid as recid.
 
 def var ctitle as char.
@@ -32,9 +33,11 @@ form
         with frame frame-a 9 down centered row 7
         no-box.
 
-
+find clien where clien.clicod = pclicod no-lock no-error.
     disp 
-        ctitle format "x(70)" no-label
+        ctitle format "x(70)" no-label skip
+        clien.clicod label "cliente" clien.clinom no-label
+
         with frame ftit
             side-labels
             row 3

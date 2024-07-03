@@ -1,6 +1,7 @@
 {admcab.i}
 
 {apibusca-garantia.i new}
+def var pok as log.
 def new shared temp-table wf-movim no-undo
     field wrec      as   recid
     field movqtm    like movim.movqtm
@@ -56,16 +57,15 @@ repeat.
         undo.
     end.
     disp func.funnom with frame fcab.
-    update pcpf
-        help "cpf do cliente ou zeros para pesquisa por nota"
-        with frame fcab.
-
+    empty temp-table ttitensnota.
     
-    if pcpf = 0 or pcpf = ?
+    update pcpf
+        help "cpf do cliente"
+        with frame fcab.
+    if pcpf = ? or pcpf = 0
     then do:
-        message "informe dados da nota".
             plojavenda = setbcod.
-        update plojaVenda label "loja Venda"  colon 16
+            update plojaVenda label "loja Venda"  colon 16
                 pdataVenda label "data Venda" colon 46
                     pnumeroNota label "Numero Nota" colon 16
                     
@@ -75,10 +75,14 @@ repeat.
             title "digite dados da nota".
             run apibusca-garantia-nota.p (input plojaVenda, input pdataVenda, input pnumeroNota, input pserieNota,
                              output pretorno).
-
-    end. 
-    else do:
-
+            if pretorno <> ""
+            then do:
+                message pretorno view-as alert-box.
+                undo.
+            end.
+            find first ttitensnota .
+            pcpf = dec(ttitensnota.cpf).
+    end.    
         find clien where clien.ciccgc = string(pcpf) no-lock no-error.
         if not avail clien
         then
@@ -98,32 +102,43 @@ repeat.
                 message "cliente nao cadastrado" view-as alert-box.
                 undo.
             end.
-        end.
-  
-        run apibusca-garantia-cpf.p (input pcpf,
+        end. 
+        else do:
+            pclicod = clien.clicod.
+        end.    
+
+        find first ttitensnota no-error.
+        if not avail ttitensnota
+        then do:
+            run apibusca-garantia-cpf.p (input pcpf,
                              output pretorno).
-
-    end.
-    
-    if pretorno <> ""
-    then do: 
-        message pretorno view-as alert-box.
-        undo.
-    end.    
-    leave.
-end.
-
+   
+            if pretorno <> ""
+            then do: 
+                hide message no-pause.
+                message pretorno view-as alert-box.
+                undo.
+            end.           
+        end.
+        
     precid = ?.
     find first ttitensnota no-error.
     if avail ttitensnota
-    then run geanotas.p (input pcpf,
+    then run geanotas.p (input pcpf, input pclicod,
                      output precid).
                      
     if precid <> ?                     
     then do:
         run geavenda.p (
-                        input pcpf, 
+                        input pcpf, pclicod,
                         input pconsultor,    
-                        input precid).
+                        input precid, 
+                        output pok).
     end.
     
+    if not pok
+    then undo.
+    
+    leave.
+    
+end.    

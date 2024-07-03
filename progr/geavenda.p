@@ -1,23 +1,109 @@
 {admcab.i}
+def input param pcpf as dec.
+def input param pclicod as int.
+def input param pconsultor as int.
+def input param precid as recid.
+def output param pok as log.
+pok = no.
+def new shared var vdata-teste-promo as date init ?.
+
 {apibusca-garantia.i}
-{inc-def-pre-gea.i}
+{inc-def-pre-gea.i new}
+{dftempWG.i new}
+def new shared var etb-entrega like setbcod.
+def new shared var dat-entrega as date.
+def new shared var dat-entrega1 as date.
+def new shared var p-dtentra as date.
+def new shared var p-dtparcela as date.
+def new shared var nome-retirada as char format "x(30)".
+def new shared var fone-retirada as char format "x(15)".
+
+def new shared var pmoeda as char format "x(30)".
+def new shared var vplanocota as int. /* helio 02082023 */
+def new shared var p-supervisor as char.
+def new shared temp-table tt-liped like liped.
+def new shared temp-table tt-senauto
+    field procod     like produ.procod
+    field preco-ori  like movim.movpc
+    field desco      as   log init no
+    field senauto    as   dec format ">>>>>>>>>>"
+    index i-pro is primary unique procod.
+def new shared temp-table tt-prodesc
+    field procod     like produ.procod
+    field preco      like movim.movpc
+    field preco-ven  like movim.movpc
+    field desco  as   log.
+
+def new shared temp-table Black_Friday
+    field numero as int
+    field valor as dec
+    field desconto as log init no
+    field pctdes as dec.    
+/**** fim parametros BLACK FRIDAY  ****/
+
+def new shared temp-table tt-cartpre
+    field seq    as int
+    field numero as int
+    field valor  as dec.
+
+def new shared temp-table tt-planos-vivo
+    field procod like produ.procod
+    field tipviv as   int
+    field codviv as   int
+    field pretab as   dec
+    field prepro as   dec.
+
+def new shared temp-table wf-imei
+    field wrec      as recid
+    field imei      as char.
+
+
 
 {garan-rfq.i new} /* garantia rfq */
-def buffer bseg-produ for produ.
-def NEW shared temp-table tt-seguroPrestamista no-undo
+def new shared temp-table tt-seguroPrestamista no-undo
     field wrec          as recid
     field procod        as int.
 
-def input param pcpf as dec.
-def input param pconsultor as int.
-def input param precid as recid.
+def buffer bseg-produ for produ.
 
 find first ttitensnota where recid(ttitensnota) = precid.
+def var ctitle as char.
+ctitle = "GARANTIA ESTENDIDA AVUILSA " + if pcpf = ? then "" else string(pcpf).
+find clien where clien.clicod = pclicod no-lock no-error.
+    disp 
+        ctitle format "x(70)" no-label skip
+        clien.clicod label "cliente" clien.clinom no-label
 
+        with frame ftit
+            side-labels
+            row 3
+            centered
+            no-box
+            color messages.
+    pause 0.    
 
+    def var vdataTransacao as date format "99/99/9999".
+    vdataTransacao = date(
+                                int(entry(2,ttitensnota.dataTransacao,"-")),
+                                int(entry(3,ttitensnota.dataTransacao,"-")),
+                                int(entry(1,ttitensnota.dataTransacao,"-"))
+                            ).
+/*     
+    disp
+     codigoLoja    label "Fil" colon 16 vdataTransacao @ dataTransacao label "data"  numeroComponente label "caixa"  nsuTransacao   label "nsu" 
+     cpfCnpjNfe     label "cpf" format "x(14)" colon 16 codigoCliente  label "cliente" 
+     numeroNfe      label "nota" colon 16 serieNfe       label "serie"  numeroCupom    label "cupom" 
+     codigoProduto  label "produto" colon 16 descricaoProduto format "x(40)" no-label
+     qtdVendidaProduto  label "qtd" colon 16 valorUnitarioProduto  label "Preco"  valorTotalProduto  label "total" 
+     valorDescontoProduto  label "desconto" colon 16 prazoGarantiaFabricanteProduto  label "prazo" 
+    with frame fdet
+        row 6 side-labels overlay.
+    pause 0.        
+  */
 run vende-segprod (input int(ttitensnota.codigoproduto), 
                    input dec(ttitensnota.valorUnitarioProduto),
                    input dec(ttitensnota.valorUnitarioProduto)). 
+
 
 def var recatu1         as recid.
 def var recatu2         as recid.
@@ -29,7 +115,7 @@ def var esqcom1         as char format "x(12)" extent 5
 
 form
     esqcom1
-    with frame f-com1 row 4 no-box no-labels column 1 centered.
+    with frame f-com1 row 5 no-box no-labels column 1 centered.
 assign
     esqpos1  = 1.
 
@@ -41,12 +127,9 @@ repeat:
     else find tt-seg-movim where recid(tt-seg-movim) = recatu1 no-lock.
     if not available tt-seg-movim
     then do.
-        sresp = no.
-        message "Sem seguros na venda. Incluir?" update sresp.
-        if not sresp
-        then leave.
-        esqvazio = yes.
-        esqpos1 = 2.
+        message "Produto nao Disponivel para venda de Garantia Avulsa" view-as alert-box.
+        
+        return.
     end.
     else esqvazio = no.
     clear frame frame-a all no-pause.
@@ -165,7 +248,11 @@ repeat:
 
             if esqcom1[esqpos1] = " Fecha "
             then do:
-                run pfecha.
+                run pfecha.                  
+                hide frame f-com1  no-pause.
+                hide frame frame-a no-pause.
+                hide frame f-desti no-pause.
+                return. 
             end.
 
 
@@ -198,7 +285,7 @@ procedure frame-a.
         produ.pronom       format "x(28)"
         tt-seg-movim.movpc format ">>>9.99" column-label "Preco"
         wf-movim.movqtm    column-label "Qtd" format ">9"    
-        with frame frame-a 12 down width 80 color white/red row 5
+        with frame frame-a 3 down width 80 color white/red row 6
                 title " Garantia Estendida / Roubo, Furto e Quebra " overlay.
 
 end procedure.
@@ -243,7 +330,6 @@ end procedure.
 
 
 
-
 procedure pfecha.
 def var parametro-in as char.
 def var parametro-out as char.
@@ -260,13 +346,14 @@ def var block-plano as log init no.
 
 bl-plano:
 do:
+    pause 0.
             update vfincod go-on (F7 f7) with frame f-desti.  
 
             if lastkey = keycode("F7") or
                lastkey = keycode("f7")
             then do:
 
-                run simula_parcela.p(input vprotot, 
+                run simula_parcela_gea.p(input vprotot, 
                                      input vdevval, 
                                      input vbonus,
                                      input no /*BAGparcela-especial*/, 
@@ -279,12 +366,62 @@ do:
                 end.
 
             end.
+            find finan where finan.fincod = vfincod no-lock.
             disp finan.fincod @ vfincod 
                  finan.finnom with frame f-desti.
-            hide frame f-condi no-pause.
-            clear frame f-condi all.
             
-            
+    identificador = "GAR - " + clien.clinom.  
+    disp identificador with frame f-desti.
+    v-vendedor = pconsultor.
+    find func where func.etbcod = setbcod and func.funcod = pconsultor no-lock.
+        disp v-vendedor 
+             func.funnom with frame f-desti. 
+    message "confirma venda da garantia avulsa?" update sresp.
+    v-serie = "P". 
+    
+    pok = sresp.
+    if sresp
+    then do on error undo, return:
+        sparam = "".
+        run gerpre.p (input recid(finan), 
+              input recid(clien), 
+              input vbonus, 
+              input v-numero, 
+              input vprotot, 
+              input ( if vdevval > vprotot 
+                      then vprotot 
+                      else vdevval ),
+              input vdevval, 
+              input v-serie, 
+              output rec-plani, 
+              input  identificador, 
+              input (if ventra-ori > 0 and
+                        ventra-ori <> ventra
+                     then ventra else 0) /* Entrada diferenciada */,
+              input "",
+              input "").
+
+        find plani where recid(plani) = rec-plani no-lock no-error. 
+        if plani.notass > 0
+        then do:
+            run p2k_geraped_gea.p (rec-plani, "", 0, recid(ttitensnota)). 
+        
+            message color red/with
+                skip
+                "PREVENDA GERADA:" string(plani.notass,">>>>9")
+                skip
+                "RESGATE P2K:" string(plani.numero)
+                view-as alert-box title "".
+        end.
+        else message color red/with
+                skip
+                "PREVENDA GERADA : " string(plani.notass,">>>>9")
+                skip(1)
+                view-as alert-box title "".
+        pok = yes.
+    end.
+        
 end.
+
 
 end procedure.

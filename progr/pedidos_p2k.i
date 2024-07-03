@@ -2,7 +2,8 @@ def {1} shared work-table ttp2k_pedido01 no-undo
     field Numero_Pedido  as int format ">>>>>>>>>>9" 
     field codigo_loja    as int format ">>9"
     field Codigo_Cliente as int format ">>>>>>>>>9"
-    field nome_cliente   as char format "x(20)".
+    field nome_cliente   as char format "x(15)"
+    field dataPedido     as date format "99/99/9999"  .
 
 def {1} shared work-table ttp2k_pedido02 no-undo
     field Numero_Pedido  as int format ">>>>>>>>>>9"  
