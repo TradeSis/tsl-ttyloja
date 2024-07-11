@@ -1,11 +1,11 @@
 /* helio 08022024 - versao 2 garantias 555859 */
-/* helio 02082023 - IDENTIFICA«√O VENDAS COM COTAS - PROCESSO 521965*/
-/* helio 23022023 Projeto AlteraÁ„o AlÌquota de ICMS PR - Volmir */
+/* helio 02082023 - IDENTIFICA√á√ÉO VENDAS COM COTAS - PROCESSO 521965*/
+/* helio 23022023 Projeto Altera√ß√£o Al√≠quota de ICMS PR - Volmir */
 /* 31012023 helio - ajuste projeto cupom desconto b2b - sera enviado o cupom no tipo 8 */
-/* helio 20012022 - [UNIFICA«√O ZURICH - FASE 2] NOVO C¡LCULO PARA SEGURO PRESTAMISTA M”VEIS NA PR…-VENDA */
+/* helio 20012022 - [UNIFICA√á√ÉO ZURICH - FASE 2] NOVO C√ÅLCULO PARA SEGURO PRESTAMISTA M√ìVEIS NA PR√â-VENDA */
 
 /* 
-helio 09022022 - [ORQUESTRA 243179] SeleÁ„o de moeda a vista na PrÈ-Venda 
+helio 09022022 - [ORQUESTRA 243179] Sele√ß√£o de moeda a vista na Pr√©-Venda 
 helio 20122021 mudanca aliquita icms 2022        
 04.02.2020 helio.neto - 189 - cupom desconto
 17/02/2020 helio.neto - 188
@@ -410,7 +410,7 @@ for each movim where movim.etbcod = plani.etbcod
         Plani.notass    format "9999999999" /* Numero_Pedido */
         Movim.movseq    format "999999"     /* Seq_Item_Pedido */
         0               format "99999"      /* Num_Componente  */
-        wf-movim.vencod    format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
+        wf-movim.vencod    format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */        
         string(Movim.procod,"99999999999999999999")
                         format "x(20)"      /* Codigo_Produto */
         0 /**Movim.procod**/    format "99999999999999" /* Cod_Autom_Prod */
@@ -476,14 +476,21 @@ then put unformatted
 else
 if pmoeda <> ""
 then do:
+    
+    vplano = 0.
     if pmoeda = "DINHEIRO"  then vforma = 1.
     if pmoeda = "TEFDEBITO" then vforma = 9.
+    if pmoeda = "PIX"       
+    then do:
+        vforma = 20. /* Helio 04032024 */
+        vplano = 2.
+    end.    
     
-     put unformatted
+    put unformatted
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        0 /* forca plano 0*/ /*plani.pedcod */   format "99999" /* plani */
+        vplano format "99999" /* plano */
         vprotot * 100   format "9999999999999"
         skip.
 
@@ -516,7 +523,7 @@ for each tt-seg-movim no-lock.
         Plani.etbcod        format "99999"      /* Codigo_Loja */
         Plani.notass        format "9999999999" /* Numero_Pedido */
         0                   format "99999"      /* Num_Componente */
-        wf-movim.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
+        wf-movim.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */        
         string(tt-seg-movim.procod,"99999999999999999999")
                             format "x(20)"      /* Codigo_Produto */
         0                   format "99999999999999" /* Cod_Autom_Prod */
@@ -623,8 +630,8 @@ for each movim where movim.etbcod = plani.etbcod and
            *     skip.
            */
         /************************************************************
-        ****    Sai apÛs colocar a primeira linha do registro 9  ****
-        ****    no arquivo pois todas ser„o iguais.              ****
+        ****    Sai ap√≥s colocar a primeira linha do registro 9  ****
+        ****    no arquivo pois todas ser√£o iguais.              ****
         *************************************************************/
         leave.
     end.
