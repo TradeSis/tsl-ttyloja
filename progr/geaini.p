@@ -60,7 +60,7 @@ repeat.
     empty temp-table ttitensnota.
     
     update pcpf
-        help "cpf do cliente"
+        help "cpf do cliente ou zeros para digitar por numero da nota"
         with frame fcab.
     if pcpf = ? or pcpf = 0
     then do:

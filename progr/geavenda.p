@@ -119,6 +119,16 @@ form
 assign
     esqpos1  = 1.
 
+for each tt-seg-movim.
+    if tt-seg-movim.seg-procod = 8011 or 
+       tt-seg-movim.seg-procod = 8012
+    then next.
+    find first wf-movim where recid(wf-movim) = tt-seg-movim.recid-wf-movim.
+    delete wf-movim.
+    delete tt-seg-movim.
+end.
+
+
 bl-princ:
 repeat:
     disp esqcom1 with frame f-com1.

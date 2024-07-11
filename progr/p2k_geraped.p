@@ -103,7 +103,7 @@ if plani.movtdc <> 30 or            /* somente pre-vendas sao enviadas */
    plani.etbcod <> setbcod          /* somente pre-vendas da filial    */ 
 then return.
 
-varq = "/usr/admcom/helio/PD" + string(plani.etbcod,"9999") + /* p2k */
+varq = "/usr/admcom/p2k/PD" + string(plani.etbcod,"9999") + /* p2k */
        string(plani.numero,"99999999") + ".csi".
 
 def var vhora as int.
@@ -541,10 +541,12 @@ for each tt-seg-movim no-lock.
         tt-seg-movim.p2k-id_seguro format "9999999999" /* WS */
         /* helio 26062024 GE AVULSA */
         formatadata(movim.movdat) format "xxxxxxxx"   /*  Data   */
+        /*
         " " format "x(5)"   /* LOJA_VENDA_PRODUTO  */
         " " format "x(6)"   /* NSU_VENDA_PRODUTO */
         " " format "x(5)"   /* PDV_VENDA_PRODUTO */
         " " format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
+        */
         /* helio 26062024*/
         skip.
     end.

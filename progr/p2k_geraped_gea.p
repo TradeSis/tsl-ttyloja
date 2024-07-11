@@ -5,7 +5,7 @@ def input param par-campanha as int.
 def input param par-valorcupomdesconto as dec.
 def input param precid as recid.
 {apibusca-garantia.i}
-
+def var vdatatransacao as char.
 def var vx as int. /* contador */
 def shared var pmoeda as char format "x(30)".
 def shared var vcupomb2b as int format ">>>>>>>>>9". /* helio 31012023 - cupom b2b */
@@ -88,7 +88,7 @@ then return.
 
 find first ttitensNota where recid(ttitensNota) = precid .
 
-varq = "/usr/admcom/helio/PD" + string(plani.etbcod,"9999") + /* p2k */
+varq = "/usr/admcom/p2k/PD" + string(plani.etbcod,"9999") + /* p2k */
        string(plani.numero,"99999999") + ".csi".
 
 def var vhora as int.
@@ -490,6 +490,10 @@ for each tt-seg-movim no-lock.
     if avail produaux
     then vtempogar = int(produaux.valor_campo).
 
+    vdatatransacao = string(entry(1,ttitensnota.dataTransacao,"-"),"9999") +
+                     string(entry(2,ttitensnota.dataTransacao,"-"),"99") +
+                     string(entry(3,ttitensnota.dataTransacao,"-"),"99").
+    
     do vx = 1 to int(ttitensNota.qtdVendidaProduto).
         put unformatted
         5                   format "99"         /* Tipo_Reg */
@@ -520,11 +524,11 @@ for each tt-seg-movim no-lock.
         1       format "999999"    
         tt-seg-movim.p2k-id_seguro format "9999999999" /* WS */
         /* helio 26062024 GE AVULSA */
-        formatadata(plani.pladat) format "xxxxxxxx"   /*  Data   */
-        ttitensnota.codigoLoja format "x(5)"   /* LOJA_VENDA_PRODUTO  */
-        ttitensNota.nsuTransacao format "x(6)"   /* NSU_VENDA_PRODUTO */
-        ttitensNota.numeroComponente format "x(5)"   /* PDV_VENDA_PRODUTO */
-        ttitensNota.valorTotalProduto format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
+        vdatatransacao format "xxxxxxxx"   /*  Data   */
+        string(int(ttitensnota.codigoLoja),"99999") format "x(5)"   /* LOJA_VENDA_PRODUTO  */
+        string(int(ttitensNota.nsuTransacao),"zzzzz9") format "x(6)"   /* NSU_VENDA_PRODUTO */
+        string(int(ttitensNota.numeroComponente),"zzzz9") format "x(5)"   /* PDV_VENDA_PRODUTO */
+        string(dec(ttitensNota.valorTotalProduto) * 100,"9999999999999") format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
         /* helio 26062024*/
         skip.
     end.
