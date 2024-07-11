@@ -65,13 +65,13 @@ input close.
 def var vpathhml as char.
 
 def var vhml as char format "x(78)" extent 7 initial
-    ["1-Producao (ATU=26/06/2024 CDPlus + ComCred + SenhaCad + BAG Ger Car)",
+    ["1-Producao (ATU=26/06/2024 CDPlus + ComCred + BAG Ger Car)",
      "2-Homologacao Melhoria Venda Outra Loja (31/01/2024)",
-     "",
+     "3-Homologacao Projeto Senha Gerente Cadastro Rapido (11/07/2024)",
      "",
      "5-Homologacao M. 591058 PIX Plano 990 04/03/2024",
      "6-Homologacao P.GE Avulsa - Pedido Normal 26/06",
-     "" /*7-Homologacao Projeto Comissao Crediarista 29/04/2024" */
+     "7-Homologacao P.GE Avulsa 08/07"
      
      ]. 
 
@@ -85,7 +85,7 @@ vpathhml = "".
 if frame-index = 2 
 then vpathhml = "/usr/admcom/tty/hml/VENDAO/,".
 if frame-index = 3 
-then quit. /*vpathhml = "/usr/admcom/tty/hml/555081desc/,".*/
+then vpathhml = "/usr/admcom/tty/hml/senhagerenterapido/,".
 if frame-index = 4 
 then quit. /*vpathhml = "/usr/admcom/tty/hml/562981carbag/,".*/
 if frame-index = 5 
@@ -93,7 +93,7 @@ then vpathhml = "/usr/admcom/tty/hml/591058/,".
 if frame-index = 6 
 then vpathhml = "/usr/admcom/tty/hml/geavulsanormal/,".
 if frame-index = 7
-then quit. /*vpathhml = "../tty/hml/comisaocre/,".*/
+then vpathhml = "/usr/admcom/tty/hml/geavulsa/,".
 
 hide frame fhml no-pause.
 propath = vpathhml + "/usr/admcom/tty/,/usr/admcom/tty/progr/," + vpropath.

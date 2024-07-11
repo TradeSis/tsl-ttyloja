@@ -323,7 +323,7 @@ else status default "CUSTOM Business Solutions   ".*/
 
         hide frame f-senh no-pause.
 
-        run /usr/admcom/tty/menuprojeto.p.    
+        run menuprojeto.p.    
 
         /*
         display vtipo[1]
