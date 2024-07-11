@@ -1,11 +1,11 @@
 /* helio 08022024 - versao 2 garantias 555859 */
-/* helio 02082023 - IDENTIFICA«√O VENDAS COM COTAS - PROCESSO 521965*/
-/* helio 23022023 Projeto AlteraÁ„o AlÌquota de ICMS PR - Volmir */
+/* helio 02082023 - IDENTIFICA√á√ÉO VENDAS COM COTAS - PROCESSO 521965*/
+/* helio 23022023 Projeto Altera√ß√£o Al√≠quota de ICMS PR - Volmir */
 /* 31012023 helio - ajuste projeto cupom desconto b2b - sera enviado o cupom no tipo 8 */
-/* helio 20012022 - [UNIFICA«√O ZURICH - FASE 2] NOVO C¡LCULO PARA SEGURO PRESTAMISTA M”VEIS NA PR…-VENDA */
+/* helio 20012022 - [UNIFICA√á√ÉO ZURICH - FASE 2] NOVO C√ÅLCULO PARA SEGURO PRESTAMISTA M√ìVEIS NA PR√â-VENDA */
 
 /* 
-helio 09022022 - [ORQUESTRA 243179] SeleÁ„o de moeda a vista na PrÈ-Venda 
+helio 09022022 - [ORQUESTRA 243179] Sele√ß√£o de moeda a vista na Pr√©-Venda 
 helio 20122021 mudanca aliquita icms 2022        
 04.02.2020 helio.neto - 189 - cupom desconto
 17/02/2020 helio.neto - 188
@@ -548,10 +548,12 @@ for each tt-seg-movim no-lock.
         tt-seg-movim.p2k-id_seguro format "9999999999" /* WS */
         /* helio 26062024 GE AVULSA */
         formatadata(movim.movdat) format "xxxxxxxx"   /*  Data   */
+        /*
         " " format "x(5)"   /* LOJA_VENDA_PRODUTO  */
         " " format "x(6)"   /* NSU_VENDA_PRODUTO */
         " " format "x(5)"   /* PDV_VENDA_PRODUTO */
         " " format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
+        */
         /* helio 26062024*/
         skip.
     end.
@@ -628,8 +630,8 @@ for each movim where movim.etbcod = plani.etbcod and
            *     skip.
            */
         /************************************************************
-        ****    Sai apÛs colocar a primeira linha do registro 9  ****
-        ****    no arquivo pois todas ser„o iguais.              ****
+        ****    Sai ap√≥s colocar a primeira linha do registro 9  ****
+        ****    no arquivo pois todas ser√£o iguais.              ****
         *************************************************************/
         leave.
     end.
