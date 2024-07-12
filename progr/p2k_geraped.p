@@ -539,6 +539,15 @@ for each tt-seg-movim no-lock.
         tt-seg-movim.p2k-datahoraplano  format "x(14)" /* WS */
         movim.movseq       format "999999"    
         tt-seg-movim.p2k-id_seguro format "9999999999" /* WS */
+        /* helio 26062024 GE AVULSA */
+        formatadata(movim.movdat) format "xxxxxxxx"   /*  Data   */
+        /*
+        " " format "x(5)"   /* LOJA_VENDA_PRODUTO  */
+        " " format "x(6)"   /* NSU_VENDA_PRODUTO */
+        " " format "x(5)"   /* PDV_VENDA_PRODUTO */
+        " " format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
+        */
+        /* helio 26062024*/
         skip.
     end.
 end.
