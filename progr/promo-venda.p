@@ -4222,8 +4222,13 @@ procedure promo-compraXcasaY:
                 
                 tq-casa = ctpromoc.qtdbrinde * tq-casa.
                 
+                
                 if tq-casa > 0
-                then for each tt-c1c1 by tt-c1c1.movpc:
+                then do:
+                    /* helio 15/072024 - Melhoria 678355 - MÓDULO PROMOCIONAL CASADINHA */
+                    if (ctpromoc.sequencia = 30142 and setbcod = 188) or ctpromoc.sequencia = 67034 
+                    then 
+                    for each tt-c1c1 by tt-c1c1.movpc desc: /*HELIO 12072024 - DESC */
                      if tq-casa > 0 
                      then do:
                         if tt-c1c1.qtdcas > 0 and
@@ -4277,7 +4282,65 @@ procedure promo-compraXcasaY:
                     then assign
                             tt-c1c1.qtdcom  = tt-c1c1.qtdcas
                             tt-c1c1.qtdcas = 0 .
-                end.
+                  end.
+                  else /* demais modulos */
+                    for each tt-c1c1 by tt-c1c1.movpc : /* ASC */
+                     if tq-casa > 0 
+                     then do:
+                        if tt-c1c1.qtdcas > 0 and
+                           tt-c1c1.qtdcom > 0
+                        then do:
+                            if tq-casa > tt-c1c1.qtdcas + tt-c1c1.qtdcom
+                            then assign
+                                tt-c1c1.qtdcas = tt-c1c1.qtdcas + 
+                                                 tt-c1c1.qtdcom
+                                tt-c1c1.qtdcom = 0
+                                tq-casa = tq-casa - tt-c1c1.qtdcas  .
+                            else assign
+                                 tt-c1c1.qtdcom = tt-c1c1.qtdcom -
+                                 (tq-casa - tt-c1c1.qtdcas)
+                                 tt-c1c1.qtdcas = tq-casa
+                                 tq-casa = 0.
+                        end.
+                        else do:
+                            if tt-c1c1.qtdcas > 0
+                            then do:
+                                if tq-casa > tt-c1c1.qtdcas
+                                then tq-casa = tq-casa - tt-c1c1.qtdcas .
+                                else assign
+                                    tt-c1c1.qtdcas = tq-casa
+                                    tq-casa = 0.
+                            end.
+                            else do:
+                                if tt-c1c1.indcasa and 
+                                    tq-casa >= tt-c1c1.qtdcom
+                                then assign
+                                        tt-c1c1.qtdcas = tt-c1c1.qtdcom    
+                                        tt-c1c1.qtdcom = 0
+                                        tq-casa = tq-casa - tt-c1c1.qtdcas .
+                                else if tt-c1c1.indcasa  
+                                    then assign
+                                           tt-c1c1.qtdcas = tq-casa
+                                           tt-c1c1.qtdcom = tt-c1c1.qtdcom -
+                                            tq-casa
+                                           tq-casa = 0. 
+                                
+                            end.
+                        end.
+                    end.
+                    else if tq-casa = 0 and
+                        tt-c1c1.qtdcom > 0
+                    then assign
+                            tt-c1c1.qtdcom = tt-c1c1.qtdcom +
+                                tt-c1c1.qtdcas
+                            tt-c1c1.qtdcas = 0.
+                    else if tt-c1c1.qtdcas > 0
+                    then assign
+                            tt-c1c1.qtdcom  = tt-c1c1.qtdcas
+                            tt-c1c1.qtdcas = 0 .
+                  end.
+                  
+               end.   
             end.     
             else 
                 for each tt-c1c1 where tt-c1c1.qtdcom = 
@@ -4344,6 +4407,7 @@ procedure promo-compraXcasaY:
                     if q-df > 0
                     then v-totven = v-totven + (wf-movim.movpc * q-df).
                     wf-movim.movpc = v-totven / wf-movim.movqtm.
+                    
                     spromoc = yes.
                 end.
             end.
