@@ -576,7 +576,7 @@ repeat with centered row 3 side-label width 80 1 down
         then do:
             vclichar = "".
             disp vclichar.
-            run busca-pedido-p2k.p (output vclicod).
+            run busca-pedido-p2k.p (output vclicod, output vfincod).
             if vclicod <> 0
             then do:
                 find clien where clien.clicod = vclicod no-lock no-error.
@@ -887,6 +887,165 @@ repeat with centered row 3 side-label width 80 1 down
                 */
                 /*pause 0*/
                 run list_pre.p.
+                next.
+            end.
+            if lastkey = keycode("F5")
+            then do:
+                /*
+                run promo-cliente-novo.
+                */
+                /*
+                for each wf-movim no-lock,
+                    first produ where recid(produ) = wf-movim.wrec
+                            no-lock by produ.procod:
+                    create twf-movim.
+                    buffer-copy wf-movim to twf-movim.
+                end.    
+                *for each wf-movim: delete wf-movim. end. 
+                for each twf-movim:
+                    create wf-movim.
+                    buffer-copy twf-movim to wf-movim.
+                end.
+                */    
+                def var v-verchip as log init no.
+                def var v-qtdchip as int.
+                def var v-verchip2 as log init no.
+                def var v-qtdchip2 as int.
+
+                /*** vivo gsm ***/
+                def var vvalida-cel as log init no.
+                def var vvalida-chip as log init no.
+                def var v-verchip-vivo as log init no.
+                def var v-qtdchip-vivo as int.
+                
+                def var v-verchip2-vivo as log init no.
+                def var v-qtdchip2-vivo as int.
+                def var vpro405690 as log init no.
+                
+                assign v-qtdchip-vivo = 0
+                       v-verchip-vivo = no.
+
+                /*** vivo gsm ***/
+ 
+                assign v-qtdchip = 0
+                       v-verchip = no.
+                
+                for each wf-movim:
+                    find produ where recid(produ) = wf-movim.wrec no-lock.
+                    
+                    if produ.pronom begins "TELEFONE TIM"
+                    then assign v-qtdchip = v-qtdchip + 1
+                                v-verchip = yes.
+
+                    if produ.clacod = 107
+                    then assign v-qtdchip-vivo = v-qtdchip-vivo + 1
+                                v-verchip-vivo = yes.
+
+                    if produ.clacod = 107
+                    then vvalida-cel = yes.
+                    
+                    if produ.clacod = 108
+                    then vvalida-chip = yes.
+
+                    if produ.procod = 405690 or
+                       produ.procod = 413529 or
+                       produ.procod = 405661 or
+                       produ.procod = 405662
+                    then vpro405690 = yes.
+                end.
+
+                if vpro405690 = no
+                then
+                    if vvalida-cel = no and vvalida-chip = yes
+                    then do:
+                        message "Venda de CHIP somente com TELEFONE.".
+                        pause 2 no-message.
+                        undo, retry.
+                    end.
+                
+                if v-verchip
+                then do:
+                    assign v-qtdchip2 = 0
+                           v-verchip2 = no.
+
+                    for each wf-movim:
+                        find produ where recid(produ) = wf-movim.wrec no-lock.
+                        if produ.pronom begins "TIM CHIP"
+                        then assign v-qtdchip2 = v-qtdchip2 + 1
+                                    v-verchip2 = yes.
+                    end.
+
+                    if not v-verchip2
+                    then do:
+                        if v-qtdchip <> v-qtdchip2
+                        then do:
+                            if v-qtdchip > v-qtdchip2
+                            then do:
+                                message "A quantidade de Telefones e maior que a quantidade de CHIPS". pause 2 no-message.
+                                undo, retry.
+                            end.
+                            else
+                            if v-qtdchip > v-qtdchip2
+                            then do:
+                                message "A quantidade de CHIPS e maior que a quantidade de TELEFONES". pause 2 no-message.
+                                undo, retry.
+                            end.
+                        end.
+                    end.
+                end.
+                
+                if v-verchip-vivo
+                then do:        
+                    assign v-qtdchip2-vivo = 0
+                           v-verchip2-vivo = no.
+
+                    for each wf-movim:
+                        find produ where recid(produ) = wf-movim.wrec no-lock.
+                        if produ.clacod = 108
+                        then assign v-qtdchip2-vivo = v-qtdchip2-vivo + 1
+                                    v-verchip2-vivo = yes.
+
+                        if produ.procod = 405690
+                        then vpro405690 = yes.
+                    end.
+
+                    if not v-verchip2-vivo
+                    then do:
+                        if v-qtdchip-vivo <> v-qtdchip2-vivo
+                        then do:
+                            if v-qtdchip-vivo > v-qtdchip2-vivo
+                            then do:
+                                message "A quantidade de Telefones e maior que ~~a quantidade de CHIPS". pause 2 no-message.
+                                undo, retry.
+                            end.
+                            else
+                            if v-qtdchip-vivo > v-qtdchip2-vivo
+                            then do:
+                                message "A quantidade de CHIPS e maior que a qu~~antidade de TELEFONES". pause 2 no-message.
+                                undo, retry.
+                            end.
+                        end.
+                    end.
+                end.
+                
+                vopcod = vopv[2].
+                vmostradet = no.
+                hide frame fdet no-pause.
+                leave.
+            end.
+            if lastkey = keycode("G") or lastkey = keycode("g")
+            then do:
+                if not vende-garan
+                then next.
+                find first wf-movim no-lock no-error.
+                if not avail wf-movim
+                then do:
+                    message "Venda Sem Mercadoria".
+                    pause.
+                    next.
+                end.
+                run segur_pre.p.
+                run p-atu-frame.
                 next.
             end.
 
@@ -1511,22 +1670,7 @@ repeat with centered row 3 side-label width 80 1 down
                 end.
                 else release plaviv.
             end.
-            if lastkey = keycode("G") or lastkey = keycode("g")
-            then do:
-                if not vende-garan
-                then next.
-                find first wf-movim no-lock no-error.
-                if not avail wf-movim
-                then do:
-                    message "Venda Sem Mercadoria".
-                    pause.
-                    next.
-                end.
-                run segur_pre.p.
-                run p-atu-frame.
-                next.
-            end.
-
+            /* AQUI FIUCAVA A TELKA G */
             /* AQUI FICAVA TECLA L            */
             
             if lastkey = keycode("T") or lastkey = keycode("t")
@@ -1976,150 +2120,8 @@ repeat with centered row 3 side-label width 80 1 down
                 next.
             end.
 
-            if lastkey = keycode("F5")
-            then do:
-                /*
-                run promo-cliente-novo.
-                */
-                /*
-                for each wf-movim no-lock,
-                    first produ where recid(produ) = wf-movim.wrec
-                            no-lock by produ.procod:
-                    create twf-movim.
-                    buffer-copy wf-movim to twf-movim.
-                end.    
-                *for each wf-movim: delete wf-movim. end. 
-                for each twf-movim:
-                    create wf-movim.
-                    buffer-copy twf-movim to wf-movim.
-                end.
-                */    
-                def var v-verchip as log init no.
-                def var v-qtdchip as int.
-                def var v-verchip2 as log init no.
-                def var v-qtdchip2 as int.
+            /* aquii ficava o f5 */
 
-                /*** vivo gsm ***/
-                def var vvalida-cel as log init no.
-                def var vvalida-chip as log init no.
-                def var v-verchip-vivo as log init no.
-                def var v-qtdchip-vivo as int.
-                
-                def var v-verchip2-vivo as log init no.
-                def var v-qtdchip2-vivo as int.
-                def var vpro405690 as log init no.
-                
-                assign v-qtdchip-vivo = 0
-                       v-verchip-vivo = no.
-
-                /*** vivo gsm ***/
- 
-                assign v-qtdchip = 0
-                       v-verchip = no.
-                
-                for each wf-movim:
-                    find produ where recid(produ) = wf-movim.wrec no-lock.
-                    
-                    if produ.pronom begins "TELEFONE TIM"
-                    then assign v-qtdchip = v-qtdchip + 1
-                                v-verchip = yes.
-
-                    if produ.clacod = 107
-                    then assign v-qtdchip-vivo = v-qtdchip-vivo + 1
-                                v-verchip-vivo = yes.
-
-                    if produ.clacod = 107
-                    then vvalida-cel = yes.
-                    
-                    if produ.clacod = 108
-                    then vvalida-chip = yes.
-
-                    if produ.procod = 405690 or
-                       produ.procod = 413529 or
-                       produ.procod = 405661 or
-                       produ.procod = 405662
-                    then vpro405690 = yes.
-                end.
-
-                if vpro405690 = no
-                then
-                    if vvalida-cel = no and vvalida-chip = yes
-                    then do:
-                        message "Venda de CHIP somente com TELEFONE.".
-                        pause 2 no-message.
-                        undo, retry.
-                    end.
-                
-                if v-verchip
-                then do:
-                    assign v-qtdchip2 = 0
-                           v-verchip2 = no.
-
-                    for each wf-movim:
-                        find produ where recid(produ) = wf-movim.wrec no-lock.
-                        if produ.pronom begins "TIM CHIP"
-                        then assign v-qtdchip2 = v-qtdchip2 + 1
-                                    v-verchip2 = yes.
-                    end.
-
-                    if not v-verchip2
-                    then do:
-                        if v-qtdchip <> v-qtdchip2
-                        then do:
-                            if v-qtdchip > v-qtdchip2
-                            then do:
-                                message "A quantidade de Telefones e maior que a quantidade de CHIPS". pause 2 no-message.
-                                undo, retry.
-                            end.
-                            else
-                            if v-qtdchip > v-qtdchip2
-                            then do:
-                                message "A quantidade de CHIPS e maior que a quantidade de TELEFONES". pause 2 no-message.
-                                undo, retry.
-                            end.
-                        end.
-                    end.
-                end.
-                
-                if v-verchip-vivo
-                then do:        
-                    assign v-qtdchip2-vivo = 0
-                           v-verchip2-vivo = no.
-
-                    for each wf-movim:
-                        find produ where recid(produ) = wf-movim.wrec no-lock.
-                        if produ.clacod = 108
-                        then assign v-qtdchip2-vivo = v-qtdchip2-vivo + 1
-                                    v-verchip2-vivo = yes.
-
-                        if produ.procod = 405690
-                        then vpro405690 = yes.
-                    end.
-
-                    if not v-verchip2-vivo
-                    then do:
-                        if v-qtdchip-vivo <> v-qtdchip2-vivo
-                        then do:
-                            if v-qtdchip-vivo > v-qtdchip2-vivo
-                            then do:
-                                message "A quantidade de Telefones e maior que ~~a quantidade de CHIPS". pause 2 no-message.
-                                undo, retry.
-                            end.
-                            else
-                            if v-qtdchip-vivo > v-qtdchip2-vivo
-                            then do:
-                                message "A quantidade de CHIPS e maior que a qu~~antidade de TELEFONES". pause 2 no-message.
-                                undo, retry.
-                            end.
-                        end.
-                    end.
-                end.
-                
-                vopcod = vopv[2].
-                vmostradet = no.
-                hide frame fdet no-pause.
-                leave.
-            end.
             find first ped-prodexc where ped-prodexc.etbcod = setbcod
                                          and ped-prodexc.procod = int(vprocod)
                                        no-error.

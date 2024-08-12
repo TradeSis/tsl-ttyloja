@@ -1,6 +1,6 @@
 def input param petbcod as int.
 def output param par-arq as char.
-
+def var vfincod as int. /* só pra compatibilidade */
 def var par-dir as char.
 
 par-dir = "/usr/p2ksp/pedidos/ped_download/" + string(petbcod,"9999") + "/".
@@ -52,7 +52,7 @@ end.
                 delete ttp2k_pedido01. 
         end.
  
-        run importa_file_p2k.p (input tt-arqs.FULL-PATHNAME,1).
+        run importa_file_p2k.p (input tt-arqs.FULL-PATHNAME,1, output vfincod).
  
 
         find first ttp2k_pedido01 no-error.

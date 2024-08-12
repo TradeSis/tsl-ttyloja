@@ -1,6 +1,7 @@
 {admcab.i} 
 def output param vCodigo_Cliente as int.
-
+def output param vfincod         as int.
+ 
 def shared temp-table wf-movim no-undo
     field wrec      as   recid
     field movqtm    like movim.movqtm
@@ -25,6 +26,11 @@ def SHARED temp-table tt-seg-movim
     field p2k-datahoraplano as char
     field recid-wf-movim    as recid
     index seg-movim is primary unique seg-procod procod.
+    
+def shared temp-table tt-seguroPrestamista no-undo
+    field wrec          as recid
+    field procod        as int.
+    
 def buffer bprodu for produ.
 vCodigo_Cliente = 0.
 
@@ -41,7 +47,7 @@ def var parquivo as char.
     end.    
     for each ttp2k_pedido01.  delete ttp2k_pedido01.  end.
  
-    run importa_file_p2k.p (input parquivo,?).
+    run importa_file_p2k.p (input parquivo,?, output vfincod).
  
 
     find first ttp2k_pedido01 no-error.
@@ -99,7 +105,7 @@ def var parquivo as char.
                 wf-movim.movpc  = tt-seg-movim.movpc.
                 tt-seg-movim.recid-wf-movim = recid(wf-movim).
                 wf-movim.KITproagr  =   ttp2k_pedido05.Codigo_Produto.
-                wf-movim.vencod     = ttp2k_pedido02.codigo_vendedor.
+                wf-movim.vencod     = ttp2k_pedido05.codigo_vendedor.
             end.
             else do:
                 find first wf-movim where recid(wf-movim) = tt-seg-movim.recid-wf-movim no-error.
@@ -109,4 +115,17 @@ def var parquivo as char.
         end.     
     
     end.
-    
+    for each ttp2k_pedido07. 
+        find produ where produ.procod = ttp2k_pedido07.codigo_produto no-lock. 
+        create wf-movim. 
+        assign 
+            wf-movim.wrec       = recid(produ) 
+            wf-movim.movqtm     = 1 
+            wf-movim.movpc      = ttp2k_pedido07.Valor_Total
+            wf-movim.vencod     = ttp2k_pedido07.Codigo_Vendedor
+            wf-movim.movalicms  = 98. 
+        create tt-seguroPrestamista. 
+        tt-seguroPrestamista.wrec = wf-movim.wrec. 
+        tt-seguroPrestamista.procod = produ.procod.
+
+    end.    

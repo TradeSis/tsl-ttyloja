@@ -559,6 +559,8 @@ for each movim where movim.etbcod = plani.etbcod
                  and movim.placod = plani.placod no-lock.
 
     find produ of movim no-lock. 
+    find first wf-movim where wf-movim.wrec = recid(produ) no-lock no-error.    
+    
     find first tt-seguroprestamista where 
             tt-seguroprestamista.procod = produ.procod
              no-lock no-error.
@@ -584,7 +586,7 @@ for each movim where movim.etbcod = plani.etbcod
         plani.etbcod    format "99999"
         Plani.numero    format "9999999999" /* Numero_Pedido */
         9999            format "99999"
-        plani.vencod    format "999999"     /* Codigo_Vendedor */
+        wf-movim.vencod    format "999999"     /* Codigo_Vendedor */
         vservico        format "x(30)"
         movim.movpc * 100   format "9999999999999"
         skip.

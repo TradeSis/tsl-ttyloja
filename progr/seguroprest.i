@@ -34,16 +34,21 @@ procedure seguroprestamista.
     
     velegivel = no.
 
+    
+
     if vende-seguro and
        p-nprest >= 3 /* helio 15052023 - alterado de 2 para 3 */  
     then do.
-        for each wf-movim:  
+        for each wf-movim.
 
             find first tt-seguroPrestamista where tt-seguroPrestamista.wrec = wf-movim.wrec no-error.
             if avail tt-seguroPrestamista
             then do:
-                delete wf-movim.
-                delete tt-seguroPrestamista.
+                if wf-movim.vencod = 0
+                then do:
+                    delete wf-movim.
+                    delete tt-seguroPrestamista.
+                end.
                 next.
             end.
 
@@ -125,17 +130,24 @@ procedure seguroprestamista.
                 p-segprest = dec(ttsaidaparcelas.valorSeguroRateado).       
                 p-segvalor = vvalorTotalSeguroPrestamista.
 
-                create wf-movim.
-                assign
-                    wf-movim.wrec   = recid(produ)
-                    wf-movim.movqtm = 1
-                    wf-movim.movpc = vvalorTotalSeguroPrestamista
-                    wf-movim.vencod = p-vencod
-                    wf-movim.movalicms = 98.
-                create tt-seguroPrestamista.
-                tt-seguroPrestamista.wrec = wf-movim.wrec.
-                tt-seguroPrestamista.procod = produ.procod.
-            
+                find first tt-seguroPrestamista where tt-seguroPrestamista.procod = produ.procod no-error.
+                if not avail tt-seguroPrestamista
+                then do:
+                    create wf-movim.
+                    assign
+                        wf-movim.wrec   = recid(produ)
+                        wf-movim.movqtm = 1
+                        wf-movim.movpc = vvalorTotalSeguroPrestamista
+                        wf-movim.vencod = p-vencod
+                        wf-movim.movalicms = 98.
+                    create tt-seguroPrestamista.
+                    tt-seguroPrestamista.wrec = wf-movim.wrec.
+                    tt-seguroPrestamista.procod = produ.procod.
+                end.
+                else do:
+                    find first wf-movim where wf-movim.wrec = recid(produ).
+                    wf-movim.movpc = vvalorTotalSeguroPrestamista.
+                end.
             end.
         end.        
         
@@ -145,8 +157,11 @@ procedure seguroprestamista.
         /* Desfazer seguro */
         for each tt-seguroPrestamista.
             find first wf-movim where wf-movim.wrec = tt-seguroPrestamista.wrec no-error.
-            if avail wf-movim
-            then delete wf-movim.
+            if avail wf-movim and wf-movim.vencod = 0
+            then do:
+                delete wf-movim.
+                delete tt-seguroPrestamista.
+            end.    
         end.     
     end.
     

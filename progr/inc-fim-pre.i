@@ -121,19 +121,19 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                 find first wf-movim where wf-movim.wrec = ant-movim.wrec
                         and wf-movim.KITproagr = ant-movim.KITproagr
                    no-error.
-                if avail wf-movim
+                if avail wf-movim and wf-movim.vencod = 0
                 then do:
                     buffer-copy ant-movim to wf-movim.
                 end.
             end.
             run p-atu-frame.
             vcupomb2b = 0.
-            vfincod = 0.
+            /*vfincod = 0.*/
             
         end.       
         
         find first wf-movim where wf-movim.movalicms <> 98 /*GE/RFQ*/ no-error.
-        if avail wf-movim  
+        if avail wf-movim and vfincod = 0 
         then do: 
             vmen-pla = "".
             vpromocod = "".   
@@ -244,6 +244,7 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                     undo, retry.                     
                 end.
             end.
+
             disp vfincod with frame f-desti.
             pause 0.
 
@@ -412,8 +413,8 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
             p-dtparcela = ?
             libera-plano = no
                 block-plano  = no.
-                /* coloquei calcular o seguro assim que digita o plano */        
-                    run seguroprestamista (finan.finnpc, vparce, v-vencod,
+        /* coloquei calcular o seguro assim que digita o plano */        
+         run seguroprestamista (finan.finnpc, vparce, v-vencod,
                                            output vsegtipo,
                                            output vsegprest,
                                            output vsegvalor).
@@ -755,7 +756,7 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
     /*pause 0.*/
     
     if avail finan and vende-seguro and
-       vfincod > 0
+       vfincod > 0 
     then do:
             if ((vpromocod = "30106" or vpromocod = "30085") and setbcod = 188) or
            (lookup("60878",vpromocod) > 0 or
