@@ -1,4 +1,4 @@
-/* helio 02082023 - IDENTIFICAÇÃO VENDAS COM COTAS - PROCESSO 521965*/
+/* helio 02082023 - IDENTIFICAÇÃO VENDAS COM COTAS - PROCESSO 52sfle1965*/
 /* helio 07062023 Demanda 328 - Liberação de Cotas + Módulos de promoção pré venda */
 /* #042023 helio libera plano */
 /* helio 10042023 - cashb por cliente */
@@ -11,8 +11,10 @@ helio 09022022 - [ORQUESTRA 243179] Seleção de moeda a vista na Pré-Venda
 04.02.2020 helio.neto - 189 - cupom desconto
 17.02.2020 helio.neto - 188
 */
+def new shared var vplanocota as int. /* helio 02082023 */ 
+def new shared var pfincodoriginal as int init ?. /* helio 22082024 - comissao crediarista */
+def var pfincodusar as int.
 
-def new shared var vplanocota as int. /* helio 02082023 */
 def var vtemmodulo as log.
 def var vtemmodulo-i as int.
 def var vpassa as log.
@@ -121,19 +123,19 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                 find first wf-movim where wf-movim.wrec = ant-movim.wrec
                         and wf-movim.KITproagr = ant-movim.KITproagr
                    no-error.
-                if avail wf-movim
+                if avail wf-movim and wf-movim.vencod = 0
                 then do:
                     buffer-copy ant-movim to wf-movim.
                 end.
             end.
             run p-atu-frame.
             vcupomb2b = 0.
-            vfincod = 0.
+            /*vfincod = 0.*/
             
         end.       
         
         find first wf-movim where wf-movim.movalicms <> 98 /*GE/RFQ*/ no-error.
-        if avail wf-movim  
+        if avail wf-movim and vfincod = 0 
         then do: 
             vmen-pla = "".
             vpromocod = "".   
@@ -222,11 +224,25 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
             vplano-ori = vfincod.
             
             vplanocota = 0.
-            update vfincod 
+            if vfincodpedido = vfincod and vfincod <> 0
+            then disp vfincod with frame f-desti.
+            else update vfincod 
                 help "F7 Pesquisa"
                 go-on (C c F7 f7) 
                                 with frame f-desti.  
             
+            find pprodu where pprodu.procod = 559911 no-lock.
+            find first wf-movim where wf-movim.vencod <> 0 and wf-movim.wrec = recid(pprodu) no-lock no-error.
+            if avail wf-movim then do:
+                if vplano-ori <> vfincod
+                then do:
+                    message "Pedido anterior com Seguro Prestamista, não pode trocar de plano"
+                        view-as alert-box.
+                    vfincod = vplano-ori.
+                    disp vfincod with frame f-desti.
+                    undo.
+                end.
+            end.
             
             if lastkey = keycode("F7") or
                lastkey = keycode("f7")
@@ -244,6 +260,7 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                     undo, retry.                     
                 end.
             end.
+
             disp vfincod with frame f-desti.
             pause 0.
 
@@ -412,21 +429,28 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
             p-dtparcela = ?
             libera-plano = no
                 block-plano  = no.
-                /* coloquei calcular o seguro assim que digita o plano */        
-                    run seguroprestamista (finan.finnpc, vparce, v-vencod,
+        /* coloquei calcular o seguro assim que digita o plano */        
+         run seguroprestamista (finan.finnpc, vparce, v-vencod,
                                            output vsegtipo,
                                            output vsegprest,
                                            output vsegvalor).
             /*HELIO 1203
             *run p-atu-frame.
             */
-            
             parametro-in = "LIBERA-PLANO=S|CASADINHA=S|GERA-CPG=S|"
                         + "PLANO=" + string(finan.fincod) + "|"
                         + "ALTERA-PRECO=S|".
 
             run promo-venda.p(input parametro-in ,
                               output parametro-out).
+
+            /* Volta os produtos do vendedor anterior ao preco que era no pedido original */
+            for each ant-movim where ant-movim.vencod <> 0 no-lock:
+                find first wf-movim where wf-movim.wrec = ant-movim.wrec and
+                                          wf-movim.KITproagr = ant-movim.KITproagr no-error.
+                if avail wf-movim
+                then buffer-copy ant-movim to wf-movim.
+            end.
 
             vpromocaoLimite = "false".
             def var vpromocod-verificado as char. /* helio 15122023 - lentidao prevenda - rodando verificapromqtd 2 vezes */
@@ -480,6 +504,13 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                            + "PLANO=" + string(finan.fincod) + "|".
 
             run promo-venda.p(input parametro-in, output parametro-out).
+            /* Volta os produtos do vendedor anterior ao preco que era no pedido original */
+            for each ant-movim where ant-movim.vencod <> 0 no-lock:
+                find first wf-movim where wf-movim.wrec = ant-movim.wrec and
+                                          wf-movim.KITproagr = ant-movim.KITproagr no-error.
+                if avail wf-movim
+                then buffer-copy ant-movim to wf-movim.
+            end.
             
             vpromocaoLimite = "false".
               
@@ -545,9 +576,16 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                 leave.
             end.    
         end.
-        if vfincod <> 0 and vtemmodulo = no /* helio 06072023 vpromocod = ""*/
+        if vfincod <> 0 and vtemmodulo = no 
         then do:
-            {lojapi-cotasplanoverifica.i vfincod}                           
+            /* nao le cotas se pedido reaberto */
+            if vfincodpedido <> vfincod
+            then do:
+                {lojapi-cotasplanoverifica.i vfincod}                           
+            end.
+            else do:
+                vplanoCota = vfincod.
+            end.
         end.
                      
         /** helio libera plano **/                        
@@ -741,7 +779,7 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
     /*pause 0.*/
     
     if avail finan and vende-seguro and
-       vfincod > 0
+       vfincod > 0 
     then do:
             if ((vpromocod = "30106" or vpromocod = "30085") and setbcod = 188) or
            (lookup("60878",vpromocod) > 0 or
@@ -802,14 +840,19 @@ do on error undo, retry  on endkey undo, leave with frame f-desti:
                 
         end.
         else do:
-            if vsegtipo = 31
-            then message 
-          "Manter vantagens da PARCELA PROTEGIDA LEBES e ainda concorrer a 5000"
-          "mensais?" update sresp.
-            else if vsegtipo = 41
-            then message
-          "Quer concorrer a 5000 mensais e ainda ter sua parcela protegida Lebes?"
-                            update sresp.
+            find pprodu where pprodu.procod = 559911 no-lock.
+            find first wf-movim where wf-movim.vencod <> 0 and wf-movim.wrec = recid(pprodu) no-lock no-error.
+            if not avail wf-movim then do:
+                if vsegtipo = 31
+                then message 
+              "Manter vantagens da PARCELA PROTEGIDA LEBES e ainda concorrer a 5000"
+              "mensais?" update sresp.
+                else if vsegtipo = 41
+                then message
+              "Quer concorrer a 5000 mensais e ainda ter sua parcela protegida Lebes?"
+                                update sresp.
+            end.
+            else sresp = yes.
         end.
         
         if not sresp
@@ -907,18 +950,22 @@ end.
 if not avail finan 
 then undo, leave bl-plano.
 
-
+                pfincodoriginal = ?.
                 if search("rcomboplan.p") <> ? 
                 then do:
                     if vfincod > 0
                     then do:
-                            def var pfincodusar as int.
                             run rcomboplan.p (input vfincod, identificador, v-vencod, output pfincodusar ). 
                             if pfincodusar <> ? and pfincodusar <> 0
                             then do:
                                 find finan where finan.fincod = pfincodusar no-lock no-error.
-                                if not avail finan
-                                then  find finan where finan.fincod = vfincod no-lock.
+                                if avail finan
+                                then do:
+                                    pfincodoriginal = vfincod.
+                                end.
+                                else do:
+                                    find finan where finan.fincod = vfincod no-lock.
+                                end.    
                             end.    
                     end.
                 end.
@@ -982,7 +1029,7 @@ then do:
         end.
 
         /* #042023 helio libera plano */
-        if vplanocota <> 0
+        if vplanocota <> 0 and vfincodpedido <> vfincod
         then do:
             if search("lojapi-cotasplanoutiliza.p") <> ?
             then do:

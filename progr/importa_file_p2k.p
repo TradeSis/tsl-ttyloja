@@ -3,14 +3,22 @@
 
 def input param parquivo as char.
 def input param ptipo    as int.
+def output param vfincod as int.
+vfincod = 0.
 def var vtipo as int format "99".
-   
+def var vforma as int.   
 
 def var vlinha as char format "x(167)".
 input from value(parquivo).
 repeat.
     import unformatted vlinha.
     vtipo = int(substring(vlinha,1,2)).
+    if vtipo = 11
+    then do:
+        for each ttp2k_pedido01. delete ttp2k_pedido01. end.
+        vfincod = ?.
+        return.
+    end.
     if vtipo = 1 and (ptipo = 1 or ptipo = ?)
     then do: 
         create ttp2k_pedido01.
@@ -61,6 +69,34 @@ repeat.
         ttp2k_pedido05.p2k-id_seguro    =   int(substring(vlinha,231,9)).
                     
     end.
+    if vtipo = 7 and (ptipo = 7 or ptipo = ?)
+    then do:
+        vforma = int(substring(vlinha,3,2)).
+        if vforma = 2
+        then do:
+            create ttp2k_pedido07.
+            ttp2k_pedido07.Numero_Pedido    =   int(substring(vlinha,10,10)).
+            ttp2k_pedido07.Codigo_Vendedor  =   int(substring(vlinha,25,6)).
+            ttp2k_pedido07.Codigo_Produto   =   int(substring(vlinha,31,30)).
+            ttp2k_pedido07.Valor_Total      =   dec(substring(vlinha,61,13)) / 100.
+            
+        end.            
+    end.
+    if vtipo = 3 and (ptipo = 3 or ptipo = ?)
+    then do:
+        vforma = int(substring(vlinha,8,5)).
+        if vforma = 93
+        then do:
+            vfincod = int(substring(vlinha,13,5)).
+        end.            
+    end.
+    if vtipo = 8 and (ptipo = 8 or ptipo = ?)
+    then do:
+        create ttp2k_pedido08.
+        ttp2k_pedido08.observacoes = substring(vlinha,3).
+    end.
+    
+
 end.
 input close.
 
