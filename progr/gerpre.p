@@ -1,4 +1,4 @@
-/*  helio 28062023 - 479847 ALTERA플O NO FLUXO DE GERA플O DE PEDIDOS ESPECIAIS */
+/*  helio 28062023 - 4798safcrecod47 ALTERA플O NO FLUXO DE GERA플O DE PEDIDOS ESPECIAIS */
 
 {admcab.i}
 
@@ -587,6 +587,8 @@ end.
     for each wf-movim:
     
         find produ where recid(produ) = wf-movim.wrec no-lock.
+        if produ.proipiper = 98 
+        then next.
         if wf-movim.lipcor <> "" 
         then do:
             create liped.
@@ -733,7 +735,8 @@ procedure pedido-especial:
             
             for each wf-movim:
                 find produ where recid(produ) = wf-movim.wrec no-lock.
-
+                if produ.proipiper = 98 
+                then next.
                 /*  helio 28062023 - retirado tranca por fabricante */ 
                 /*if vfor-esp <> produ.fabcod
                 *then next.
