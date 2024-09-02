@@ -33,5 +33,8 @@ def {1} shared work-table ttp2k_pedido07 no-undo
     field Codigo_Vendedor   as int format ">>>>>9" 
     field Codigo_Produto    as int format ">>>>>>>>9" 
     field Valor_Total       as dec format ">>>>>>>>9.99".
+def {1} shared work-table ttp2k_pedido08 no-undo
+    field observacoes       as char.
+    
             
         

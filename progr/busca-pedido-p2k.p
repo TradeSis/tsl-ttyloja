@@ -30,7 +30,8 @@ def SHARED temp-table tt-seg-movim
 def shared temp-table tt-seguroPrestamista no-undo
     field wrec          as recid
     field procod        as int.
-    
+
+def var pfincodoriginal as int.
 def buffer bprodu for produ.
 vCodigo_Cliente = 0.
 
@@ -129,3 +130,15 @@ def var parquivo as char.
         tt-seguroPrestamista.procod = produ.procod.
 
     end.    
+    
+    for each ttp2k_pedido08.
+        pfincodoriginal = int(acha("PLANO_ORIGINAL",ttp2k_pedido08.observacoes)).
+        if pfincodoriginal <> ?
+        then do:
+            /* usando combo com desconto */
+            vfincod = pfincodoriginal.    
+            for each wf-movim.
+                wf-movim.movpc = wf-movim.precoori.
+            end.
+        end.
+    end.

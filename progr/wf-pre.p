@@ -1,6 +1,6 @@
 
 def new shared var vapiconsultarproduto as log format "Ligado/Desligado".
-
+def var vfincodpedido as int.
 def temp-table ttst no-undo
     field ncm   like produ.codfis format "99999999"
     index x is unique primary ncm asc.
@@ -564,7 +564,7 @@ repeat with centered row 3 side-label width 80 1 down
            vitem   = 0 
            vbonus  = 0 
            vmoecod = "".
-
+    vfincodpedido = ?.
     if vclicod = 0  or
        vclicod = 1
     then do on error undo:
@@ -576,7 +576,8 @@ repeat with centered row 3 side-label width 80 1 down
         then do:
             vclichar = "".
             disp vclichar.
-            run busca-pedido-p2k.p (output vclicod, output vfincod).
+            run busca-pedido-p2k.p (output vclicod, output vfincodpedido).
+            vfincod = vfincodpedido.
             if vclicod <> 0
             then do:
                 find clien where clien.clicod = vclicod no-lock no-error.
@@ -1081,7 +1082,7 @@ repeat with centered row 3 side-label width 80 1 down
                                         update sresp.
                         if sresp
                         then do:
-                            run manda_produ.p(input vprocod).
+                            /** helio 22082024 run manda_produ.p(input vprocod).**/
                             find produ where produ.procod = 
                                                 int (input vprocod) 
                                                        no-lock no-error.
@@ -2153,7 +2154,7 @@ repeat with centered row 3 side-label width 80 1 down
                                         update sresp.
                         if sresp
                         then do:
-                            run manda_produ.p(input vprocod).
+                            /** helio 22082024 run manda_produ.p(input vprocod).**/
                             find produ where produ.procod = 
                                                 int (input vprocod) 
                                                        no-lock no-error.
@@ -2181,7 +2182,7 @@ repeat with centered row 3 side-label width 80 1 down
                            no-lock no-error.
                 if not available estoq
                 then do.
-                    run manda_produ.p(input vprocod).
+                    /** helio 22082024 run manda_produ.p(input vprocod).**/
                     find estoq where estoq.procod = produ.procod
                                  and estoq.etbcod = setbcod
                                  no-lock no-error.

@@ -28,6 +28,7 @@ def shared var pmoeda as char format "x(30)".
 def shared var vcupomb2b as int format ">>>>>>>>>9". /* helio 31012023 - cupom b2b */
 def shared var vplanocota as int. /* helio 02082023 */
 def shared var p-supervisor as char.
+def shared var pfincodoriginal as int. /* helio 22082024 - comissao crediarista */
 
 def var vforma as int.
 def var varq   as char.
@@ -460,7 +461,9 @@ end.
 
 /***
     Registro 03
+
 ***/
+
 vforma = if plani.crecod = 2 and pmoeda = ""
          then 93
          else 1.
@@ -469,7 +472,7 @@ then put unformatted
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        plani.pedcod    format "99999" /* plani */
+        plani.opccod    format "99999" /* plani */
         vprotot * 100   format "9999999999999"
         skip.
 
@@ -483,7 +486,7 @@ then do:
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        0 /* forca plano 0*/ /*plani.pedcod */   format "99999" /* plani */
+        0 /* forca plano 0*/  format "99999" /* plani */
         vprotot * 100   format "9999999999999"
         skip.
 
@@ -635,7 +638,7 @@ end.
 /* 31012023 helio - ajuste projeto cupom desconto b2b - sera enviado o cupom no tipo 8 */
 /* alterado o envio do tipo 8 */
 if vcha-obs-ped-especial <> "" or vcupomb2b <> 0  or p-supervisor <> ""
-    /* helio 02082023 */ or vplanocota <> 0
+    /* helio 02082023 */ or vplanocota <> 0 or pfincodoriginal <> ?
 then do:
     if vcha-obs-ped-especial = "PEDIDOESPECIAL" then vcha-obs-ped-especial = "PEDIDOESPECIAL=SIM".
      
@@ -658,6 +661,13 @@ then do:
                                  then "|" 
                                  else "") + 
                                  "DESC_REGIONAL=" + p-supervisor.
+
+    if pfincodoriginal <> ?
+    then vcha-obs-ped-especial = vcha-obs-ped-especial + 
+                                 (if vcha-obs-ped-especial <> ""
+                                  then "|"
+                                  else "") +
+                                    "PLANO_ORIGINAL=" + string(pfincodoriginal).
 
     put unformatted
                 8                     format "99"     /* Tipo_Reg */ 

@@ -56,6 +56,12 @@ end.
  
 
         find first ttp2k_pedido01 no-error.
+         
+        if not avail ttp2k_pedido01 then do:
+            delete tt-arqs.
+            next.
+        end.    
+       
         if avail ttp2k_pedido01
         then do:
         tt-arqs.numero_pedido   = ttp2k_pedido01.numero_pedido.
@@ -65,10 +71,12 @@ end.
         tt-arqs.dataPedido      = ttp2k_pedido01.dataPedido.
         delete ttp2k_pedido01.    
         end.    
-
+        
         if tt-arqs.datapedido < today - 2 then do:
             delete tt-arqs.
+            next.
         end.    
+ 
 
     END.
     input close.
