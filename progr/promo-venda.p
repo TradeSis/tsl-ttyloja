@@ -1952,7 +1952,7 @@ procedure p-casadinha:
                               else ctpromoc.dtinicio <= today) and
             ctpromoc.dtfim  >= today and
             ctpromoc.linha = 0 
-            no-lock by ctpromoc.descontopercentual:
+            no-lock by ctpromoc.promocod  by ctpromoc.descontopercentual:
         if ctpromoc.situacao <> "L"
         then next.
         if ctpromo.promocod = 54 then next.
@@ -2260,8 +2260,20 @@ procedure p-casadinha:
                                     if valt-movpc = yes and
                                        v-menos1 = yes
                                     then do:
-                                        wf-movim.movpc =  wf-movim.movpc - 
-                                        (qbrinde / wf-movim.movqtm).
+                                        /* helio 19082024 */
+                                        def var vaux as dec.
+                                        if wf-movim.movqtm > 1
+                                        then do:
+                                            vaux = wf-movim.movpc * wf-movim.movqtm.
+                                            vaux = vaux - qbrinde.
+                                            wf-movim.movpc = vaux / wf-movim.movqtm.
+                                        end.
+                                        else do:
+                                            wf-movim.movpc = wf-movim.movpc - qbrinde.
+                                        end.
+                                        /* helio retirado
+                                        wf-movim.movpc =  wf-movim.movpc -  (qbrinde / wf-movim.movqtm).
+                                        */
                                         spromoc = yes.                
                             /* helio 09032022 - [ORQUESTRA 243179 - ESCOPO ADICIONAL] Seleção de moeda a vista na Pré-Venda  */ 
                             xx = promocod(ctpromoc.sequencia).
@@ -2329,7 +2341,6 @@ procedure p-casadinha:
             if avail dctpromoc  
                     /*and (vbr-ok = no or ctpromoc.promocod = 49)*/ 
             then do:
-                
                 if  valt-movpc and
                    ( ctpromoc.sequencia = 11097 
                    or ctpromoc.sequencia = 11303
@@ -3738,7 +3749,6 @@ procedure promo-compra1casa1:
                     tq-prom = int(tq-movi / 2)
                     tq-casa = tq-movi - tq-prom.
             end.
-            
             def var ind-cas as int.
             def var ind-com as int.
             def var mov-qtm as int.
@@ -3756,27 +3766,6 @@ procedure promo-compra1casa1:
                 ind-com = ind-com + tt-c1c1.qtdcom.
             end.
             
-            /**************
-            if ind-cas > ind-com
-            then do:
-                assign
-                        ind-com = int(ind-cas / 2) 
-                        ind-cas = ind-cas - ind-com.
-            
-                
-                for each tt-c1c1 where tt-c1c1.indcas by tt-c1c1.movpc:
-                    
-                    if ind-cas <= 0 and tt-c1c1.qtdcas > 0
-                    then assign
-                             tt-c1c1.qtdcom = tt-c1c1.qtdcom + tt-c1c1.qtdcas
-                             tt-c1c1.qtdcas = 0.
-                             
-                    ind-cas = ind-cas - tt-c1c1.qtdcas.
-                    
-                end.
-            end.
-            *************/
-
             if ind-cas > ind-com
             then do:
                 assign
@@ -3847,10 +3836,33 @@ procedure promo-compra1casa1:
                     q-c1 = q-c1 + tt-c1c1.qtdcom 
                     q-c2 = q-c2 + tt-c1c1.qtdcas .
             end.
-            
             if ctpromoc.vendaacimade > 0
             then do:
                 total-venda = 0.
+                /* helio 30082024 - 1280 ajustando quantidades quando casados maior que comprados */
+                def var hcom as int.
+                def var hcas as int.
+                def var hmaiscas as int.
+                for each tt-c1c1.
+                    hcom = hcom + tt-c1c1.qtdcom.
+                    hcas = hcas + tt-c1c1.qtdcas.
+                end.
+                if hcas > hcom
+                then do:
+                    hmaiscas = hcas - hcom.
+                    for each tt-c1c1 where qtdcas > 0.
+                        if qtdcas > hmaiscas
+                        then do:
+                            hmaiscas = hmaiscas - qtdcas. 
+                            qtdcas = 0.
+                        end.
+                        else do:
+                            qtdcas = qtdcas - hmaiscas.
+                            leave.
+                        end.
+                    end.
+                end.
+                /**/
                 if q-c1 > 0 and q-c2 > 0
                 then
                 for each wf-movim by wf-movim.movpc /*descending*/:
@@ -3883,7 +3895,6 @@ procedure promo-compra1casa1:
                 venda-acima-de = no.
                 run valida-venda-acimade-casadinha.
             end.
-
             if q-c1 > 0 and q-c2 > 0 and venda-acima-de
             then
             for each wf-movim by wf-movim.movpc /*descending*/:
@@ -3909,7 +3920,6 @@ procedure promo-compra1casa1:
                     if v-totven / wf-movim.movqtm > wf-movim.movpc
                     then.
                     else wf-movim.movpc = v-totven / wf-movim.movqtm.
-
                     if avail ctpromoc
                     then 
                                                 /* helio 09032022 - [ORQUESTRA 243179 - ESCOPO ADICIONAL] Seleção de moeda a vista na Pré-Venda  */ 
@@ -4206,11 +4216,6 @@ procedure promo-compraXcasaY:
                         end.
                     end. 
             end.
-            /*
-             for each tt-c1c1:
-                             disp tt-c1c1. pause.
-                             end.
-            */
 
             if tq-movi > ctpromoc.qtdvenda - ctpromoc.qtdbrinde
             then do:

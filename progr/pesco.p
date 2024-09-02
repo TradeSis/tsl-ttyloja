@@ -159,6 +159,15 @@ procedure pesquisa.
     end.
 
  for each ttestoque.
+    
+    /* helio 15072024 id 1117 listagem C900 pre venda */
+    if  int(ttestoque.codigoEstabelecimento) = 900
+    then do:
+        delete ttestoque.
+        next.
+    end.
+    /**/
+    
     create wpro.
     wpro.etbcod = int(ttestoque.codigoEstabelecimento).
     find estab where estab.etbcod = wpro.etbcod no-lock. 
