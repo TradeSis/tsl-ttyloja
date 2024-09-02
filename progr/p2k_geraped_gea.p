@@ -1,28 +1,11 @@
-/* helio 08022024 - versao 2 garantias 555859 */
-/* helio 02082023 - IDENTIFICAÇÃO VENDAS COM COTAS - PROCESSO 521965*/
-/* helio 23022023 Projeto Alteração Alíquota de ICMS PR - Volmir */
-/* 31012023 helio - ajuste projeto cupom desconto b2b - sera enviado o cupom no tipo 8 */
-/* helio 20012022 - [UNIFICAÇÃO ZURICH - FASE 2] NOVO CÁLCULO PARA SEGURO PRESTAMISTA MÓVEIS NA PRÉ-VENDA */
-
-/* 
-helio 09022022 - [ORQUESTRA 243179] Seleção de moeda a vista na Pré-Venda 
-helio 20122021 mudanca aliquita icms 2022        
-04.02.2020 helio.neto - 189 - cupom desconto
-17/02/2020 helio.neto - 188
-*/
-
-/*  
-  envio de pre-venda para P2K
-  10/2017 - registro 05: garantia e RFQ
-  #1 04/2018 - registro 11: entrega em outra loja
-*/
 {admcab.i}
 
 def input parameter par-rec as recid.
-
 def input param par-campanha as int.
 def input param par-valorcupomdesconto as dec.
-
+def input param precid as recid.
+{apibusca-garantia.i}
+def var vdatatransacao as char.
 def var vx as int. /* contador */
 def shared var pmoeda as char format "x(30)".
 def shared var vcupomb2b as int format ">>>>>>>>>9". /* helio 31012023 - cupom b2b */
@@ -102,6 +85,8 @@ if plani.movtdc <> 30 or            /* somente pre-vendas sao enviadas */
    plani.notped = "U" or            /* excluidas nao sao enviadas      */ 
    plani.etbcod <> setbcod          /* somente pre-vendas da filial    */ 
 then return.
+
+find first ttitensNota where recid(ttitensNota) = precid .
 
 varq = "/usr/admcom/p2k/PD" + string(plani.etbcod,"9999") + /* p2k */
        string(plani.numero,"99999999") + ".csi".
@@ -253,6 +238,7 @@ def var vcha-dat-ped-especial as char.
 def var vcha-obs-ped-especial as char.
 def buffer xestab for estab.
 
+/**
 for each movim where movim.etbcod = plani.etbcod
                  and movim.placod = plani.placod
                no-lock.
@@ -450,6 +436,7 @@ for each movim where movim.etbcod = plani.etbcod
                         format "x(15)"          /* IMEI */
         skip.        
 end.
+**/
 
 for each tt-seg-movim no-lock.
     find first wf-movim where recid(wf-movim) = tt-seg-movim.recid-wf-movim.
@@ -492,15 +479,8 @@ end.
     Registro 05 - GE / RFQ
 ***/
 for each tt-seg-movim no-lock.
-
-    
-    find first movim where movim.etbcod = plani.etbcod
-                       and movim.placod = plani.placod
-                       and movim.procod = tt-seg-movim.procod
-                     no-lock.
-    find first wf-movim where recid(wf-movim) = tt-seg-movim.recid-wf-movim.
-
-    find produ of tt-seg-movim no-lock.
+   
+    find produ where produ.procod = int(ttitensNota.codigoProduto) no-lock.
     find bprodu where bprodu.procod = tt-seg-movim.seg-procod no-lock.
 
     vtempogar = 0.
@@ -510,13 +490,17 @@ for each tt-seg-movim no-lock.
     if avail produaux
     then vtempogar = int(produaux.valor_campo).
 
-    do vx = 1 to wf-movim.movqtm:
+    vdatatransacao = string(entry(1,ttitensnota.dataTransacao,"-"),"9999") +
+                     string(entry(2,ttitensnota.dataTransacao,"-"),"99") +
+                     string(entry(3,ttitensnota.dataTransacao,"-"),"99").
+    
+    do vx = 1 to int(ttitensNota.qtdVendidaProduto).
         put unformatted
         5                   format "99"         /* Tipo_Reg */
         Plani.etbcod        format "99999"      /* Codigo_Loja */
         Plani.notass        format "9999999999" /* Numero_Pedido */
         0                   format "99999"      /* Num_Componente */
-        wf-movim.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
+        plani.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
         string(tt-seg-movim.procod,"99999999999999999999")
                             format "x(20)"      /* Codigo_Produto */
         0                   format "99999999999999" /* Cod_Autom_Prod */
@@ -537,24 +521,25 @@ for each tt-seg-movim no-lock.
         substr(tt-seg-movim.p2k-datahoraprodu, 9, 6)
                             format "x(6)"       /* Hora Venda */
         tt-seg-movim.p2k-datahoraplano  format "x(14)" /* WS */
-        movim.movseq       format "999999"    
+        1       format "999999"    
         tt-seg-movim.p2k-id_seguro format "9999999999" /* WS */
         /* helio 26062024 GE AVULSA */
-        formatadata(movim.movdat) format "xxxxxxxx"   /*  Data   */
-        /*
-        " " format "x(5)"   /* LOJA_VENDA_PRODUTO  */
-        " " format "x(6)"   /* NSU_VENDA_PRODUTO */
-        " " format "x(5)"   /* PDV_VENDA_PRODUTO */
-        " " format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
-        */
+        vdatatransacao format "xxxxxxxx"   /*  Data   */
+        string(int(ttitensnota.codigoLoja),"99999") format "x(5)"   /* LOJA_VENDA_PRODUTO  */
+        string(int(ttitensNota.nsuTransacao),"zzzzz9") format "x(6)"   /* NSU_VENDA_PRODUTO */
+        string(int(ttitensNota.numeroComponente),"zzzz9") format "x(5)"   /* PDV_VENDA_PRODUTO */
+        string(dec(ttitensNota.valorTotalProduto) * 100,"9999999999999") format "xxxxxxxxxxxxx" /* VALOR_VENDA_PRODUTO */
         /* helio 26062024*/
         skip.
     end.
+
+     
 end.
 
 /***
     Registro 07
 ***/
+/**
 for each movim where movim.etbcod = plani.etbcod
                  and movim.placod = plani.placod no-lock.
 
@@ -589,13 +574,13 @@ for each movim where movim.etbcod = plani.etbcod
         movim.movpc * 100   format "9999999999999"
         skip.
 end.
-
+**/
 /***
     Registro tipo 8 - Pedido especial
 ***/
 
 /* 31012023 */ vcha-obs-ped-especial = "".
-
+/**
 for each movim where movim.etbcod = plani.etbcod and
                      movim.placod = plani.placod no-lock.
 
@@ -663,6 +648,8 @@ then do:
                 skip.
 
 end.
+**/
+
 /*31012023 */
 
 /***
@@ -732,6 +719,4 @@ put unformatted
 
 output close.
 
-if setbcod = 189
-then unix silent scp value(varq) /usr/admcom/relat/.
 
