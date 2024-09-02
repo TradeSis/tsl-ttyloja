@@ -28,4 +28,13 @@ def {1} shared work-table ttp2k_pedido05 no-undo
     field p2k-datahoraplano as char format "x(14)"
     field movseq            as int format "999999"
     field p2k-id_seguro     as int format "9999999999".
+def {1} shared work-table ttp2k_pedido07 no-undo
+    field Numero_Pedido  as int format ">>>>>>>>>>9"  
+    field Codigo_Vendedor   as int format ">>>>>9" 
+    field Codigo_Produto    as int format ">>>>>>>>9" 
+    field Valor_Total       as dec format ">>>>>>>>9.99".
+def {1} shared work-table ttp2k_pedido08 no-undo
+    field observacoes       as char.
+    
+            
         
