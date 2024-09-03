@@ -27,17 +27,17 @@ def temp-table tterro no-undo serialize-name "return"
     field retorno  as char.
  
 /* HANDLE */
-def temp-table tttoken serialize-name "token"  
-    field idUsuario     as char
+def temp-table tttoken serialize-name "dadosEntrada"  
+    field idToken     as char
     field token         as char.
 
-def temp-table ttusuario serialize-name "usuario"  
-    field idUsuario     as char
+def temp-table ttusuario serialize-name "usuarios"  
+ /*   field idUsuario     as char*/
     field senhaCorreta  as log.
                                 
 
 create tttoken.
-tttoken.idUsuario   = pidUsuario.
+tttoken.idToken   = pidUsuario.
 tttoken.token       = ptoken.
      
 hentrada = temp-table tttoken:HANDLE. 
