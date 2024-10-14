@@ -47,9 +47,10 @@ end.
                                   string(day(today),"99").
 
         if ttcampos.idcampo =  "proposta.dataFimVigencia" then ttcampos.conteudo = 
-                                    string(year(today + 365),"9999") + "-" +
-                                  string(month(today + 365),"99") + "-" +
-                                  string(day(today + 365),"99").
+                                /* helio 2409 - 1314 365 para 365 */
+                                    string(year(today + 364),"9999") + "-" +
+                                  string(month(today + 364),"99") + "-" +
+                                  string(day(today + 364),"99").
 
         if ttcampos.idcampo =  "proposta.vigenciaPeriodoEmMeses" then ttcampos.conteudo = "12".
         
