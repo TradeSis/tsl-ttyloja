@@ -467,10 +467,24 @@ repeat:
                                 vanos = truncate((today - vdata) / 365,0).
                                 if vanos < vpermin
                                 then do:
-                                    message "Idade Minima " vpermin "Anos"
+                                    message "Idade Minima " vpermin "Anos" 
                                         view-as alert-box.
                                     undo.
-                                end.     
+                                end.    
+                                else do:
+                                    if vanos = vpermin
+                                    then do:
+                                        if month(vdata) = month(today)
+                                        then do:
+                                            if daY(vdata) > day(today)
+                                            then do:
+                                                message "Idade Minima " vpermin "Anos" 
+                                                view-as alert-box.
+                                                undo.
+                                            end.
+                                        end.
+                                    end.
+                                end.
                             end.
                         end.
                         if ttcampos.PERIODO_MAXIMO <> ?
