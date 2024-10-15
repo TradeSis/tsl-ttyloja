@@ -1082,7 +1082,7 @@ repeat with centered row 3 side-label width 80 1 down
                                         update sresp.
                         if sresp
                         then do:
-                            /** helio 22082024 run manda_produ.p(input vprocod).**/
+                            run manda_produ.p(input vprocod).
                             find produ where produ.procod = 
                                                 int (input vprocod) 
                                                        no-lock no-error.
@@ -2154,7 +2154,7 @@ repeat with centered row 3 side-label width 80 1 down
                                         update sresp.
                         if sresp
                         then do:
-                            /** helio 22082024 run manda_produ.p(input vprocod).**/
+                            run manda_produ.p(input vprocod).
                             find produ where produ.procod = 
                                                 int (input vprocod) 
                                                        no-lock no-error.
@@ -2182,7 +2182,7 @@ repeat with centered row 3 side-label width 80 1 down
                            no-lock no-error.
                 if not available estoq
                 then do.
-                    /** helio 22082024 run manda_produ.p(input vprocod).**/
+                    run manda_produ.p(input vprocod).
                     find estoq where estoq.procod = produ.procod
                                  and estoq.etbcod = setbcod
                                  no-lock no-error.

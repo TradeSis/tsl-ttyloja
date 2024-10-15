@@ -14,7 +14,7 @@ disp
      side-labels centered  
      title " ABERTURA DE NOVA CAIXA - REVERSA ".
 
-petbdest = 900.     
+petbdest = 901.     
 update 
     petbdest label "estabelecimento destino"
         with frame fcab.
@@ -36,6 +36,13 @@ then do:
         view-as alert-box.
     undo.    
 end.
+if petbdest = 900
+then do:
+    message "CD BLOQUEADO"
+        view-as alert-box.
+    undo.    
+end.
+
 
 sresp = yes.
 message "Confirma criar uma nova caixa" update sresp.
