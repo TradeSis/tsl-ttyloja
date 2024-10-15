@@ -494,7 +494,7 @@ then do:
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        vplano /* Plano 990 Pix */
+        vplano format "99999" /* Plano 990 Pix */
         vprotot * 100   format "9999999999999"
         skip.
 
