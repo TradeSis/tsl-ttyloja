@@ -90,7 +90,6 @@ find first ttitensNota where recid(ttitensNota) = precid .
 
 varq = "/usr/admcom/p2k/PD" + string(plani.etbcod,"9999") + /* p2k */
        string(plani.numero,"99999999") + ".csi".
-
 def var vhora as int.
 def var Codigo_CPF_CNPJ as char format "x(18)".
 def var Digito_CPF_CNPJ as char format "xx".
@@ -456,7 +455,7 @@ then put unformatted
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        plani.pedcod    format "99999" /* plani */
+        plani.opccod    format "99999" /* plani */
         vprotot * 100   format "9999999999999"
         skip.
 
@@ -479,7 +478,9 @@ end.
     Registro 05 - GE / RFQ
 ***/
 for each tt-seg-movim no-lock.
-   
+
+    find first wf-movim where recid(wf-movim) = tt-seg-movim.recid-wf-movim.
+
     find produ where produ.procod = int(ttitensNota.codigoProduto) no-lock.
     find bprodu where bprodu.procod = tt-seg-movim.seg-procod no-lock.
 
@@ -500,7 +501,7 @@ for each tt-seg-movim no-lock.
         Plani.etbcod        format "99999"      /* Codigo_Loja */
         Plani.notass        format "9999999999" /* Numero_Pedido */
         0                   format "99999"      /* Num_Componente */
-        plani.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
+        wf-movim.vencod        format "999999"     /* Codigo_Vendedor */ /* helio 07062024 - comissao crediarista */
         string(tt-seg-movim.procod,"99999999999999999999")
                             format "x(20)"      /* Codigo_Produto */
         0                   format "99999999999999" /* Cod_Autom_Prod */

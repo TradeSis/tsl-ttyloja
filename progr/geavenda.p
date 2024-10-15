@@ -386,6 +386,10 @@ do:
     find func where func.etbcod = setbcod and func.funcod = pconsultor no-lock.
         disp v-vendedor 
              func.funnom with frame f-desti. 
+    for each wf-movim where wf-movim.vencod = 0. 
+        wf-movim.vencod = func.funcod. 
+    end.
+
     message "confirma venda da garantia avulsa?" update sresp.
     v-serie = "P". 
     
