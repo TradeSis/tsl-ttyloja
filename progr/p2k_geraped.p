@@ -479,14 +479,22 @@ then put unformatted
 else
 if pmoeda <> ""
 then do:
+    /* Plano 990 Pix */
+    def var vplano as int.
+    vplano = 0.
     if pmoeda = "DINHEIRO"  then vforma = 1.
     if pmoeda = "TEFDEBITO" then vforma = 9.
-    
+    if pmoeda = "PIX"       
+    then do:
+        vforma = 20. /* Helio 04032024 */
+        vplano = 2.
+    end.    
+    /*    */
      put unformatted
         "03"            format "xx"    /* tipo_reg */
         "00001"         format "99999" /* Numero_Pedido */
         vforma          format "99999" /* forma */
-        0 /* forca plano 0*/  format "99999" /* plani */
+        vplano format "99999" /* Plano 990 Pix */
         vprotot * 100   format "9999999999999"
         skip.
 
