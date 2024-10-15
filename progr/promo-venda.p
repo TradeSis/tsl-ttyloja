@@ -413,6 +413,7 @@ procedure desconto:
                        (ctpromoc.sequencia = 60878 or
                         ctpromoc.sequencia = 65507) 
                     then do:
+
                         if produ.proipiper = 98
                         then do:
                             if produ.procod = 559911 /* permite desconto somente para este codigo plano bis */
@@ -2176,10 +2177,18 @@ procedure p-casadinha:
                        qbrinde = ctpromoc.qtdbrinde and
                        qprodu >= ctpromoc.qtdvenda 
                     then do:
+                        /* helio 11092024 - 1286 - modulo de brinde nao passava no plano 274 - total da venda estava vindo menor */
+                        total-venda = 0.
+                        for each wf-movim.
+                            total-venda = total-venda + (wf-movim.movqtm * wf-movim.movpc).
+                        end.
+                        total-venda-prazo = total-venda.
+                        /***/
+
                         if ctpromoc.vendaacimade = 0 or
-                           (total-venda-prazo >= ctpromoc.vendaacimade and
+                           (total-venda-prazo >= ctpromoc.vendaacimade and 
                             (ctpromoc.campodec2[3] = 0 or
-                            total-venda-prazo <= ctpromoc.campodec2[3]))
+                            total-venda-prazo <= ctpromoc.campodec2[3])) 
                         then do: 
                         vbr-ok = no.
                         do vi = 1 to qbrinde:
@@ -3661,7 +3670,6 @@ procedure promo-compra1casa1:
                     tt-c1c1.valorcas = valor-produto-venda-casada
                     tt-c1c1.tipocas  = tipo-valor-venda-casada 
                     tq-movi = tq-movi + wf-movim.movqtm.
-          
                 if na-promocao or na-casadinha
                 then do:   
                     if na-promocao and not na-casadinha
@@ -3742,7 +3750,6 @@ procedure promo-compra1casa1:
             end.
             if tq-movi > 1
             then do:
-            
             if tq-casa >= tq-prom
             then do:
                 assign
@@ -3765,6 +3772,7 @@ procedure promo-compra1casa1:
             for each tt-c1c1 where tt-c1c1.indprom:
                 ind-com = ind-com + tt-c1c1.qtdcom.
             end.
+            
             
             if ind-cas > ind-com
             then do:
@@ -3850,11 +3858,12 @@ procedure promo-compra1casa1:
                 if hcas > hcom
                 then do:
                     hmaiscas = hcas - hcom.
-                    for each tt-c1c1 where qtdcas > 0.
+                    for each tt-c1c1 where qtdcas > 0 by qtdcas desc. /* helio 11092024 - 1312 modulo brinde - colocado by desc*/
                         if qtdcas > hmaiscas
                         then do:
+                            qtdcas = qtdcas - hmaiscas.
+                            qtdcom = qtdcom + hmaiscas.
                             hmaiscas = hmaiscas - qtdcas. 
-                            qtdcas = 0.
                         end.
                         else do:
                             qtdcas = qtdcas - hmaiscas.
@@ -3863,6 +3872,7 @@ procedure promo-compra1casa1:
                     end.
                 end.
                 /**/
+                
                 if q-c1 > 0 and q-c2 > 0
                 then
                 for each wf-movim by wf-movim.movpc /*descending*/:
