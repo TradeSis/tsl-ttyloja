@@ -22,7 +22,7 @@ def temp-table tterro no-undo serialize-name "return"
  
 /* HANDLE */
 def shared temp-table ttusertoken serialize-name "usuarios"  
-    field idUsuario     as char.
+    field idToken     as char.
                                 
      
 hsaida   = temp-table ttusertoken:HANDLE.
