@@ -6,6 +6,7 @@ def var pnomeapi as char        init "lojas".
 def var pnomerecurso as char    init "cotasplanoutiliza".
 
 def input   param pcodigoPlano      as int.
+def input param psupcod as int.
 
 def var phttp_code as int.
 def var presposta   as char.
@@ -72,8 +73,10 @@ input close.
     if vhostname = "filial188"
     then vchost = "sv-ca-db-qa". 
     else vchost = "10.2.0.83". 
-
-    vapi = "http://\{IP\}/bsweb/api/lojas/\{codigoFilial\}/cotasPlanoUtiliza".
+    if psupcod = 0
+    then vapi = "http://\{IP\}/bsweb/api/lojas/\{codigoFilial\}/cotasPlanoUtiliza".
+    else vapi = "http://\{IP\}/bsweb/api/lojas/\{codigoFilial\}/cotasPlanoSupUtiliza".
+    
     
     vapi = replace(vapi,"\{IP\}",vchost).
     vapi = replace(vapi,"\{codigoFilial\}",string(setbcod)).
