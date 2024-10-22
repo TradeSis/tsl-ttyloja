@@ -8,7 +8,11 @@ def var pnomerecurso as char    init "cotasplanoverifica".
 def input   param pcodigoPlano      as int.
 def output  param pplanobloqueio    as int.
 def output  param pmensagem as char.
+def output  param psupcod   as int.
+def output  param pidtoken   as char.
 
+psupcod = 0.
+pidtoken = "".
 def var phttp_code as int.
 def var presposta   as char.
 
@@ -36,9 +40,14 @@ def temp-table ttfincotaetb serialize-name "return"
     field dtfvig        as date 
     field cotaslib      as int 
     field cotasuso      as int     
-    field planobloqueio   as char /* true/false */
-    field mensagem as char.
-                                
+    field planobloqueio   as char /* 0= liberado / 1 = Bloqueio / 2= senha gerente */ 
+    field mensagem   as char 
+    field supcod     as int 
+    field supnom     as char 
+    field cotassuplib      as int 
+    field cotassupuso      as int 
+    field idtoken    AS CHAR.
+    
     create ttentrada.
     ttentrada.codigoFilial  = setbcod.
     ttentrada.codigoPlano   = pcodigoPlano.
@@ -77,6 +86,7 @@ input close.
     then vchost = "sv-ca-db-qa". 
     else vchost = "10.2.0.83". 
 
+    
     vapi = "http://\{IP\}/bsweb/api/lojas/\{codigoFilial\}/cotasPlanoVerifica".
     
     vapi = replace(vapi,"\{IP\}",vchost).
@@ -163,6 +173,15 @@ then do:
         then do:
             pplanobloqueio = int(ttfincotaetb.planobloqueio).
             pmensagem      = ttfincotaetb.mensagem.
+            if pplanobloqueio = 1
+            then do:
+                if ttfincotaetb.cotassuplib - ttfincotaetb.cotassupuso > 0
+                then do:
+                    psupcod     = ttfincotaetb.supcod.
+                    pidtoken    = ttfincotaetb.idtoken.
+                end.
+            end.
+
         end. 
     
     

@@ -11,6 +11,8 @@ helio 09022022 - [ORQUESTRA 243179] Seleção de moeda a vista na Pré-Venda
 04.02.2020 helio.neto - 189 - cupom desconto
 17.02.2020 helio.neto - 188
 */
+def var psupcod as int.
+def var pidtoken as char.
 def new shared var vplanocota as int. /* helio 02082023 */ 
 def new shared var pfincodoriginal as int init ?. /* helio 22082024 - comissao crediarista */
 def var pfincodusar as int.
@@ -1036,7 +1038,7 @@ then do:
         then do:
             if search("lojapi-cotasplanoutiliza.p") <> ?
             then do:
-                run lojapi-cotasplanoutiliza.p (vplanocota).
+                run lojapi-cotasplanoutiliza.p (vplanocota, psupcod).
             end.    
         end.
         

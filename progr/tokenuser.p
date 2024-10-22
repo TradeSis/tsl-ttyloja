@@ -1,7 +1,7 @@
-def output param pidusuario as char.
+def output param pidToken as char.
             
 def new shared temp-table ttusertoken serialize-name "usuarios"  
-    field idUsuario     as char.
+    field idToken     as char.
 
 run lojapi-tokenusuarios.p.
 
@@ -24,7 +24,7 @@ repeat:
     end.
     clear frame frame-a all no-pause.
 
-    display ttusertoken.idusuario format "x(20)"
+    display ttusertoken.idToken format "x(20)"
             with frame frame-a 11 down overlay
                 centered row 5  no-labels
                 title " Escolha o Usuario ".
@@ -38,7 +38,7 @@ repeat:
         then leave.
         down
             with frame frame-a.
-        display ttusertoken.idusuario 
+        display ttusertoken.idToken 
                 with frame frame-a.
     end.
     up frame-line(frame-a) - 1 with frame frame-a.
@@ -47,7 +47,7 @@ repeat:
 
         find ttusertoken where recid(ttusertoken) = recatu1.
 
-        choose field ttusertoken.idusuario 
+        choose field ttusertoken.idToken 
             go-on(cursor-down cursor-up
                   PF4 F4 ESC return).
     
@@ -57,7 +57,7 @@ repeat:
             if not avail ttusertoken
             then next.
             color display white/red
-                ttusertoken.idusuario.
+                ttusertoken.idToken.
             if frame-line(frame-a) = frame-down(frame-a)
             then scroll with frame frame-a.
             else down with frame frame-a.
@@ -68,14 +68,14 @@ repeat:
             if not avail ttusertoken
             then next.
             color display white/red
-                ttusertoken.idusuario.
+                ttusertoken.idToken.
             if frame-line(frame-a) = 1
             then scroll down with frame frame-a.
             else up with frame frame-a.
         end.
         if keyfunction(lastkey) = "end-error"
         then do:
-            pidusuario = "".
+            pidToken = "".
             hide frame frame-a no-pause.
             leave bl-princ.
         end.
@@ -83,14 +83,14 @@ repeat:
         if keyfunction(lastkey) = "return"
         then do on error undo, retry on endkey undo, leave.
             hide frame frame-a no-pause.
-            pidusuario = ttusertoken.idusuario.
+            pidToken = ttusertoken.idToken.
             return.
         end.    
         /*
         if keyfunction(lastkey) = "end-error"
         then view frame frame-a.
         */
-        display ttusertoken.idusuario 
+        display ttusertoken.idToken 
                     with frame frame-a.
         recatu1 = recid(ttusertoken).
    end.
