@@ -95,6 +95,8 @@ vende-seguro = par-valor = "SIM".
 def temp-table tt-promoc no-undo like ctpromoc .
 def buffer bctpromoc for ctpromoc.
 
+
+/**** helio 17102024 gea
 for each ctpromoc where ctpromoc.linha = 0 and
                         ctpromoc.dtfim >= today and
                         ctpromoc.situacao = "L"
@@ -118,7 +120,7 @@ for each ctpromoc where ctpromoc.linha = 0 and
         buffer-copy ctpromoc to tt-promoc.
     end.
 end. 
-
+**/
 
 def var parametro-in as char.
 def var parametro-out as char.
@@ -130,7 +132,20 @@ message "Aguarde...".
 def var xtime as int.
 xtime = time.
 
-for each finan no-lock:
+for each finan 
+        where
+        finan.fincod = 301 or
+        finan.fincod = 102 or
+        finan.fincod = 302 or
+        finan.fincod = 103 or
+        finan.fincod = 503 or
+        finan.fincod = 904 or
+        finan.fincod = 915 or
+        finan.fincod = 919 or
+        finan.fincod = 0
+        no-lock:
+    
+    /** helio 17102024 geavulsa
     find first finesp where finesp.fincod = finan.fincod
                no-lock no-error.
     if not avail finesp and
@@ -199,7 +214,7 @@ for each finan no-lock:
         then next.
     end.
     
-        
+    ***/    
     assign
         vfincod = finan.fincod
         vliqui = 0
@@ -392,9 +407,8 @@ for each finan no-lock:
     /*disp finan    .*/
     
 end.
-
+/** helio 17102024 geavulsa
 message "tempo processamento inicial" string(time - xtime,"HH:MM:SS").
-
 hide message no-pause.
 message "chamando api" string(time - xtime,"HH:MM:SS").
 xtime = time.
@@ -402,6 +416,7 @@ run seguroprestamistalote (output velegivel, output vsegvalor).
 hide message no-pause.
 message "tempo api" string(time - xtime,"HH:MM:SS").
 hide message no-pause.
+**/
 
 for each tt-simula.
 
