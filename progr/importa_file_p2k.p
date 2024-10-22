@@ -66,7 +66,7 @@ repeat.
         ttp2k_pedido05.p2k-datahoraprodu =  substring(vlinha,176,8) + substring(vlinha,205,6).
         ttp2k_pedido05.p2k-datahoraplano =  substring(vlinha,211,14).
         ttp2k_pedido05.movseq           =   int(substring(vlinha,225,6)).
-        ttp2k_pedido05.p2k-id_seguro    =   int(substring(vlinha,231,9)).
+        ttp2k_pedido05.p2k-id_seguro    =   int(substring(vlinha,232,9)). /* helio 211024 - 1406 */
                     
     end.
     if vtipo = 7 and (ptipo = 7 or ptipo = ?)
