@@ -56,10 +56,10 @@ def new global shared var sretorno-ecf     as   char format "x(40)".
 def new global shared var scabrel       as char.
 def new global shared var sretorno     as    char format "x(40)".
 def new global shared var sestacao     as char.
-def new global shared var wserie-nf  like plani.serie.
-def new global shared var wemite-nf  like plani.emite. 
-def new global shared var wnumero-nf like plani.numero.
-def new global shared var wplacod-nf like plani.placod.
+def new global shared var wserie-nf  like com.plani.serie.
+def new global shared var wemite-nf  like com.plani.emite. 
+def new global shared var wnumero-nf like com.plani.numero.
+def new global shared var wplacod-nf like com.plani.placod.
 def new global shared var warqlog-pdv as char.
 def new global shared var wcontnum   like contrato.contnum.
 def new global shared var wtpamb-nf  as char.

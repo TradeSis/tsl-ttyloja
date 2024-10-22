@@ -4,6 +4,18 @@ def var vlcsaida as longchar.
 def var hentrada as handle.
 
 def var hsaida as handle.
+def var vchost as char.
+def var vhostname as char.
+def var wurl as char.
+
+input through hostname.
+import unformatted vhostname.
+input close. 
+    if vhostname = "filial188"  
+    then vchost = "172.19.130.11".  
+    else vchost = "172.19.130.175".
+
+
 
 {wc-consultamargemdesconto.i}
 
@@ -22,7 +34,7 @@ vsaida  = "/usr/admcom/work/margemdesconto" + string(today,"999999") + replace(s
 
 output to value(vsaida + ".sh").
 put unformatted
-    "curl -X POST -s \"http://172.19.130.175:5555/gateway/pdvRestAPI/1.0/consultaMargemDescontoRestResource" + "\" " +
+    "curl -X POST -s \"http://" + vchost + ":5555/gateway/pdvRestAPI/1.0/consultaMargemDescontoRestResource" + "\" " +
     " -H \"Content-Type: application/json\" " +
     " -d '" + string(vLCEntrada) + "' " + 
     " -o "  + vsaida.
@@ -42,13 +54,10 @@ input close.
 vLCsaida = vresposta.
 
 hSaida:READ-JSON("longchar",vLCSaida, "EMPTY").
-
-            
             unix silent value("rm -f " + vsaida). 
             unix silent value("rm -f " + vsaida + ".erro"). 
             unix silent value("rm -f " + vsaida + ".sh"). 
 
-            
 hide message no-pause.
 
 
