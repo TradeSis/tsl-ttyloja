@@ -31,8 +31,8 @@ INPUT CLOSE.
                     trim(ppid) + ".json". 
     
     if vhostname = "filial188"  
-    then vchost = "sv-ca-db-qa".  
-    else vchost = "10.2.0.83".
+    then vchost = "172.19.130.11".  
+    else vchost = "172.19.130.175".
 
 
     wurl = "http://" + vchost + "/bsweb/api/prestamista/calculaLoteSeguroPrestamista".

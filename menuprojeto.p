@@ -1,32 +1,4 @@
-/* #102022 helio lebes bag */
-/* #092022 helio bau */
-/* medico na tela 042022 - helio */
 {admcab.i}
-/*
-def var vtipo as char format "x(35)" extent 12
-    initial[" 1. Pre Venda",
-            " 2. Consultas",
-              3 Consulta xtrato
-              4 consulta est/for
-              5 consulta vendas
-            " 6. Pedidos",
-            " 7. Atualiza",
-            " 8. Analise de planos por vendedor",
-            " 9. Intencao de compra", 
-            " 10. Solicita Cartao Lebes",
-            " 11. Porta-relatorios", 
-            " 12. Sair"].
-
-
-def var tipo-pedido as char format "x(15)" extent 1
-    initial[" Automatico"].
-
-def var tipo-atualiza as char format "x(30)" extent 4
-    initial["Atualiza Promocao/Plano",
-            "Atualiza Produto",
-            "Atualiza Promocoes/Modulo",
-            "Atualiza Promocoes Novas"].
-*/
 def var menp1   as char format "x(20)" extent 5 
         init  ["                    ",
                "     ASSISTENTE ",
@@ -101,9 +73,14 @@ def var menp10  as char format "x(20)" extent 5
                "   FUNCIONARIO",
                ""].
 def var prop10  as char init "func.p".    
- 
-def var menp11   as char format "x(20)" extent 5 init  
-              [""].
+
+ def var menp11  as char format "x(20)" extent 5   
+        init  ["",
+               "   GARANTIA",
+               "   ESTENDIDA ",
+               "    avulsa",
+               ""].
+def var prop11  as char init "geaini.p".    
 def var menp12   as char format "x(20)" extent 5 init  
               [""].
               
@@ -333,6 +310,9 @@ repeat:
         if vpos = 10        then do:
             run value(prop10).
         end.
+        if vpos = 11 then do:
+            run value(prop11).
+        end.    
         
         
         
