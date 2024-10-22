@@ -513,7 +513,7 @@ for each tt-seg-movim no-lock.
         vtempogar           format "999"
         tt-seg-movim.meses  format "999"
         tt-seg-movim.subtipo format "x(1)"
-        0                   format "9999999999" /* cupom venda produto */
+        int(ttitensnota.numeroNfe)    format "9999999999" /* cupom venda produto */
         substr(tt-seg-movim.p2k-datahoraprodu, 1, 8)
                             format "x(8)"       /* data venda produto */
         0                   format "99999"      /* seq obriga forma */

@@ -377,6 +377,22 @@ do:
 
             end.
             find finan where finan.fincod = vfincod no-lock.
+        if
+        finan.fincod = 301 or
+        finan.fincod = 102 or
+        finan.fincod = 302 or
+        finan.fincod = 103 or
+        finan.fincod = 503 or
+        finan.fincod = 904 or
+        finan.fincod = 915 or
+        finan.fincod = 919 or
+        finan.fincod = 0
+        then.
+        else do:
+            message "Plano Invalido". pause.
+            undo.
+        end.    
+
             disp finan.fincod @ vfincod 
                  finan.finnom with frame f-desti.
             
